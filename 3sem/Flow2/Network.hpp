@@ -25,6 +25,7 @@ namespace NNetwork
     
     class Network: public NGraph::Graph<NetworkEdge>
     {
+    protected:
         ui32 s, t;
         
         Network()

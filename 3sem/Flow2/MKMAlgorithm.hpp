@@ -49,6 +49,13 @@ namespace NSearchingBlockingFlowAlgorithm
             }
         }
         
+        bool isEdgeNotReversed(const NNetwork::NetworkEdge * edge)
+        {
+            ui32 v = edge->reverse_edge->to;
+            
+            return distance[v] + 1 == distance[edge->to];
+        }
+        
         void getPotentials()
         {
             for (ui32 v = 0; v < size(); ++v)
@@ -57,7 +64,7 @@ namespace NSearchingBlockingFlowAlgorithm
                 
                 for (ui32 i = 0; i < edges.size(); ++i)
                 {
-                    if (edges[i]->is_real)
+                    if (isEdgeNotReversed(edges[i]))
                     {
                         potential_to[edges[i]->to] += edges[i]->capacity - edges[i]->flow;
                         potential_from[v] += edges[i]->capacity - edges[i]->flow;
@@ -97,7 +104,7 @@ namespace NSearchingBlockingFlowAlgorithm
         
         ui32 vertexWithMinimalPotential()
         {
-            ui32 v = -1;
+            ui32 v = UINT_MAX;
             ui64 p = ULONG_MAX;
             
             for (ui32 i = 0; i < size(); ++i)
@@ -119,11 +126,14 @@ namespace NSearchingBlockingFlowAlgorithm
                 if (!is_exist[edges[i]->to])
                     continue;
                 
-                if (edges[i]->is_real)
+                if (isEdgeNotReversed(edges[i]))
                     potential_to[edges[i]->to] -= edges[i]->capacity - edges[i]->flow;
                 else
                     potential_from[edges[i]->to] -= edges[i]->reverse_edge->capacity - edges[i]->reverse_edge->flow;
             }
+            
+            potential_from[vertex] = 0;
+            potential_to[vertex] = 0;
             
             is_exist[vertex] = 0;
         }
@@ -181,7 +191,8 @@ namespace NSearchingBlockingFlowAlgorithm
                     if (!is_exist[edges[i]->to])
                         continue;
                     
-                    if ((edges[i]->is_real && direction == TO_RIGHT) || (!edges[i]->is_real && direction == TO_LEFT))
+                    if ((isEdgeNotReversed(edges[i]) && direction == TO_RIGHT) ||
+                    (!isEdgeNotReversed(edges[i]) && direction == TO_LEFT))
                     {
                         long long d = push(edges[i], excess, direction);
                         if (d)
@@ -196,8 +207,8 @@ namespace NSearchingBlockingFlowAlgorithm
         
     public:
         LayredNetwork(const NNetwork::Network * net)
-        : distance(vector<ui32>(net->size(), UINT_MAX)), is_exist(vector<bool>(net->size(), 1)), potential_to(vector<ui64>(net->size(), 0)),
-        potential_from(vector<ui64>(net->size(), 0))
+        : distance(vector<ui32>(net->size(), UINT_MAX)), is_exist(vector<bool>(net->size(), 1)), 
+        potential_to(vector<ui64>(net->size(), 0)), potential_from(vector<ui64>(net->size(), 0))
         {
             graph.resize(net->size());
             getLayredNetwork(net);
@@ -209,10 +220,14 @@ namespace NSearchingBlockingFlowAlgorithm
             for (ui32 i = 0; i < size(); ++i)
             {
                 ui32 vertex = vertexWithMinimalPotential();
+                assert(vertex != UINT_MAX);
+                
                 ui64 potential = calcPotencial(vertex);
                 
                 pushFlow(vertex, TO_RIGHT, potential);
                 pushFlow(vertex, TO_LEFT, potential);
+                
+                assert(calcPotencial(vertex) == 0);
                 
                 deleteVertex(vertex);
             }
