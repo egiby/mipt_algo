@@ -1,5 +1,5 @@
 #ifndef _NETWORK
-#defint _NETWORK
+#define _NETWORK
 
 #include "Graph.hpp"
 
@@ -86,12 +86,16 @@ namespace NNetwork
             return s;
         }
         
-        ~Network()
+        void clear()
         {
             for (ui32 v = 0; v < size(); ++v)
                 for (ui32 i = 0; i < graph[v].size(); ++i)
                     if (!graph[v][i]->is_real)
                         delete graph[v][i];
+        }
+        
+        ~Network()
+        {
         }
     };
 }

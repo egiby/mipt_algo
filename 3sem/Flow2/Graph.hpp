@@ -1,5 +1,5 @@
 #ifndef _GRAPH
-#defint _GRAPH
+#define _GRAPH
 
 #include <iostream>
 #include <climits>
