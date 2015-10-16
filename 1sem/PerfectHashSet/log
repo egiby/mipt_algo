@@ -1,0 +1,570 @@
+Testing 0
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.119944
+
+std::set:
+0.02765
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 1
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.11017
+
+std::set:
+0.0279819
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 2
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.100912
+
+std::set:
+0.0234037
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 3
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.103432
+
+std::set:
+0.0263054
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 4
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.118124
+
+std::set:
+0.0281232
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 5
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.106732
+
+std::set:
+0.0252845
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 6
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.0795685
+
+std::set:
+0.0226078
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 7
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.130157
+
+std::set:
+0.0333199
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 8
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.0560319
+
+std::set:
+0.0168766
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+
+Testing 9
+1. test of Init
+a) Unequal keys:
+PerfectHashSet:
+0.0733029
+
+std::set:
+0.0193923
+
+b) Equal keys
+PerfectHashSet:
+
+std::set:
+
+2. test of IsPossibleKey
+PerfectHashSet:
+
+std::set:
+
+3. test of Insert, Has, Erase
+a) Small tests:
+PerfectHashSet:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+std::set:
+has, size, insert, has, size, erase, has, size
+Has: 0
+Size: 0
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert, insert, has, size, erase, has, size
+Has: 1
+Size: 1
+Has: 0
+Size: 0
+
+insert bad key:
+
+b) Stress
+

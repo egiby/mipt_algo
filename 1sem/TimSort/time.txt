@@ -1,0 +1,24 @@
+Random integer vector, n = 10000000
+TimSort - 1.632s
+Std::sort - 1.064s
+tim/std - 1.534
+std/tim - 0.652
+
+Partially sorted string vector, n = 1000000
+TimSort - 0.441s
+Std::sort - 1.269s
+tim/std - 0.348
+std/tim - 2.875
+
+Sorted vector with some swaps, n = 10000000
+TimSort - 0.121s
+Std::sort - 0.208s
+tim/std - 0.584
+std/tim - 1.711
+
+Point vector, stable test n = 10000000
+TimSort - 2.716s
+Std::sort - 1.133s
+tim/std - 2.398
+std/tim - 0.417
+

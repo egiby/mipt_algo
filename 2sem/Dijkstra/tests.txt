@@ -1,0 +1,7 @@
+Все сдавалось в контесте http://informatics.mccme.ru/mod/statements/view.php?id=10845
+
+1) test_time.cpp - задача G - посылка 1760-7869
+2) test_usual.cpp - задача C - посылка 19-15036
+3) test_bus.cpp - задача E - посылка 85-3191
+4) test_cups.cpp - задача F - посылка 19-15053
+(интересна тем, что для нее нужна структура Distance)
