@@ -12,14 +12,12 @@ namespace NNetwork
         ui32 capacity;
         int flow;
         NetworkEdge * reverse_edge;
-        bool is_real;
         
-        NetworkEdge(ui32 vertex, ui32 _capacity, bool real = 1)
+        NetworkEdge(ui32 vertex, ui32 _capacity)
         {
             flow = 0;
             to = vertex;
             capacity = _capacity;
-            is_real = real;
         }
     };
     
@@ -45,7 +43,7 @@ namespace NNetwork
             NetworkEdge *to, *reversed;
             
             to = &edge;
-            reversed = new NetworkEdge(v, 0, 0);
+            reversed = new NetworkEdge(v, 0);
             
             to->reverse_edge = reversed;
             reversed->reverse_edge = to;
@@ -91,7 +89,7 @@ namespace NNetwork
         {
             for (ui32 v = 0; v < size(); ++v)
                 for (ui32 i = 0; i < graph[v].size(); ++i)
-                    if (!graph[v][i]->is_real)
+                    if (graph[v][i]->capacity)
                         delete graph[v][i];
         }
         
