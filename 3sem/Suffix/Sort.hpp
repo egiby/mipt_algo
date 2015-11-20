@@ -70,8 +70,7 @@ void countingSort(Iterator begin, Iterator end, GetDigit get_digit)
         }
     }
     
-    for (Iterator it = begin; it != end; ++it)
-        *it = new_array[it - begin];
+    std::move(new_array.begin(), new_array.end(), begin);
 }
 
 template<class Iterator, class GetDigit = GetIntegerDigit>
