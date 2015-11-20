@@ -55,20 +55,20 @@ void countingSort(Iterator begin, Iterator end, GetDigit get_digit)
     if (end <= begin)
         return;
     
-    vector<vector<Iterator> > buckets(get_digit.getAlphabetSize());
+    vector<ui32> buckets(get_digit.getAlphabetSize() + 1);
     
     for (Iterator it = begin; it != end; ++it)
-        buckets[get_digit(*it)].push_back(it);
-    
-    vector<typename std::iterator_traits<Iterator>::value_type> new_array;
-
-    for (auto bucket: buckets)
     {
-        for (auto it: bucket)
-        {
-            new_array.push_back(*it);
-        }
+        assert(get_digit(*it) < get_digit.getAlphabetSize());
+        ++buckets[get_digit(*it) + 1];
     }
+    
+    for (ui32 i = 1; i < buckets.size(); ++i)
+        buckets[i] += buckets[i - 1];
+    
+    vector<typename std::iterator_traits<Iterator>::value_type> new_array(end - begin);
+    for (Iterator it = begin; it != end; ++it)
+        new_array[buckets[get_digit(*it)]++] = *it;
     
     std::move(new_array.begin(), new_array.end(), begin);
 }
