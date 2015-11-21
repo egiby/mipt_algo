@@ -57,6 +57,31 @@ public:
     }
 };
 
+class GetPairFirstDigit: public IGetDigit<pair<ui32, ui32> >
+{
+    ui32 alphabet_size;
+public:
+    GetPairFirstDigit (ui32 alphabet_size)
+    : alphabet_size(alphabet_size)
+    {
+    }
+    
+    ui32 operator () (const pair<ui32, ui32> &a) const
+    {
+        return a.first;
+    }
+    
+    bool next()
+    {
+        return false;
+    }
+    
+    ui32 getAlphabetSize() const
+    {
+        return alphabet_size;
+    }
+}
+
 class SuffixArray
 {
     vector<ui32> str;
@@ -165,15 +190,15 @@ class SuffixArray
         // building of array_0
         vector<pair<ui32, bool> > array_0;
         
-        vector<pair<array<ui32, 1>, ui32> > pairs;
+        vector<pair<ui32, ui32> > pairs;
         
         for (ui32 i = 0; i < array_1_2.size(); ++i)
             if (array_1_2[i].first % 3 == 1)
             {
-                pairs.push_back(make_pair(array<ui32, 1>({{str[array_1_2[i].first - 1]}}), array_1_2[i].first - 1));
+                pairs.push_back(make_pair(str[array_1_2[i].first - 1], array_1_2[i].first - 1));
             }
         
-        countingSort(pairs.begin(), pairs.end(), GetArrayDigit<array<ui32, 1> >(alphabet_size + (str.size() % 3 == 1)));
+        countingSort(pairs.begin(), pairs.end(), GetPairFirstDigit(alphabet_size + (str.size() % 3 == 1)));
         
         for (ui32 i = 0; i < pairs.size(); ++i)
         {
