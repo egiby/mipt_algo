@@ -1,14 +1,11 @@
 #include <algorithm>
 #include <vector>
-
-#include <iostream>
+#include <cassert>
 
 typedef unsigned int ui32;
 
 using std::vector;
 using std::pair;
-
-using std::cerr;
 
 template<class Type>
 class IGetDigit
