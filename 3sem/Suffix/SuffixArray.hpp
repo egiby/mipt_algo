@@ -27,8 +27,8 @@ class MergeCompare
     {
         array<ui32, 3> triple;
         triple[0] = str[i];
-        triple[1] = getElement(i + 1, str);
-        triple[2] = getElement(i + 2, rank_1_2);
+        triple[1] = getElement(i + 1, str, 1);
+        triple[2] = getElement(i + 2, rank_1_2, 1);
         
         return triple;
     }
@@ -48,7 +48,8 @@ public:
             std::swap(l, r);
         
         if (l % 3 == 1)
-            result = make_pair(str[l], getElement(l + 1, rank_1_2)) < make_pair(str[r], getElement(r + 1, rank_1_2));
+            result = make_pair(str[l], getElement(l + 1, rank_1_2, 1)) < 
+            make_pair(str[r], getElement(r + 1, rank_1_2, 1));
         else
             result = makeTriple(l) < makeTriple(r);
         
@@ -64,7 +65,7 @@ class SuffixArray
     vector<ui32> lcp;
     ui32 alphabet_size;
     
-    void getSmallAlphabet()
+    ui32 getSmallAlphabet()
     {
         vector<ui32> alphabet(str);
         
@@ -81,35 +82,33 @@ class SuffixArray
         
         for (ui32 i = 0; i < str.size(); ++i)
             str[i] = ch[str[i]];
-    }
-    
-    void getAlphabetSize(bool is_alphabet_small)
-    {
-        if (!is_alphabet_small)
-            getSmallAlphabet();
-            
-        alphabet_size = *std::max_element(str.begin(), str.end()) + 1;
-    }
-    
-    vector<ui32> getCompressedString()
-    {
-        ui32 old_size = str.size();
         
-        str.push_back(0);
-        str.push_back(0);
-        if (old_size % 3 == 1)
-            str.push_back(0);
+        return ch.size() + 1;
+    }
+    
+    void getAlphabetSize()
+    {
+        if (!alphabet_size)
+            alphabet_size = getSmallAlphabet();
+    }
+    
+    vector<ui32> getCompressedString(ui32 &new_alphabet_size)
+    {
+        ui32 new_size = str.size() + 2;
+        
+        if (str.size() % 3 == 1)
+            new_size++;
         
         vector<pair<array<ui32, 3>, ui32> > triples;
         
-        for (ui32 i = 0; i + 2 < str.size(); ++i)
+        for (ui32 i = 0; i + 2 < new_size; ++i)
         {
             if (!(i % 3))
                 continue;
                 
             array<ui32, 3> triple;
             for (ui32 j = 0; j < 3; ++j)
-                triple[j] = str[i + j];
+                triple[j] = getElement(i + j, str);
             
             triples.push_back(make_pair(triple, i));
         }
@@ -118,7 +117,7 @@ class SuffixArray
         
         vector<ui32> new_str(triples.size());
         
-        ui32 color = 1, num_left = (old_size + 1 + (old_size % 3  == 1)) / 3;
+        ui32 color = 1, num_left = (str.size() + 1 + (str.size() % 3  == 1)) / 3;
         
         for (ui32 i = 0; i < triples.size(); ++i)
         {
@@ -133,14 +132,7 @@ class SuffixArray
             new_str[index] = color;
         }
         
-        str.pop_back();
-        str.pop_back();
-        if (old_size % 3 == 1)
-        {
-            str.pop_back();
-        }
-        
-        assert(str.size() == old_size);
+        new_alphabet_size = color + 1;
         
         return new_str;
     }
@@ -151,7 +143,11 @@ class SuffixArray
             return;
         
         // recursion
-        SuffixArray new_array(getCompressedString(), true);
+        ui32 new_alphabet_size(0);
+        
+        vector<ui32> compressed_str = getCompressedString(new_alphabet_size);
+        
+        SuffixArray new_array(compressed_str, new_alphabet_size);
         
         // building of array_1_2
         vector<pair<ui32, bool> > array_1_2;
@@ -201,6 +197,39 @@ class SuffixArray
             suffix_array[i] = pre_array[i].first;
     }
     
+    SuffixArray (const vector<ui32> &str, ui32 _alphabet_size)
+    : str(str), suffix_array(vector<ui32>(str.size(), 0))
+    {
+        alphabet_size = _alphabet_size;
+        buildSuffixArray();
+    }
+    
+public:
+    SuffixArray (const vector<ui32> &str, const vector<ui32> &suffix_array)
+    : str(str), suffix_array(suffix_array)
+    {
+        alphabet_size = 0;
+        getAlphabetSize();
+    }
+    
+    SuffixArray (const vector<ui32> &str)
+    : str(str), suffix_array(vector<ui32>(str.size(), 0))
+    {
+        alphabet_size = 0;
+        getAlphabetSize();
+        buildSuffixArray();
+    }
+    
+    size_t size() const
+    {
+        return str.size();
+    }
+    
+    const vector<ui32>& getArray() const
+    {
+        return suffix_array;
+    }
+    
     void calcLCP()
     {
         vector<ui32> rank(str.size());
@@ -231,43 +260,9 @@ class SuffixArray
             lcp[rank[i]] = last;
         }
     }
-public:
-    SuffixArray (const vector<ui32> &str, const vector<ui32> &suffix_array, bool is_alphabet_small = 0)
-    : str(str), suffix_array(suffix_array)
-    {
-        getAlphabetSize(is_alphabet_small);
-    }
     
-    SuffixArray (const vector<ui32> &str, bool is_alphabet_small = 0)
-    : str(str), suffix_array(vector<ui32>(str.size(), 0))
+    const vector<ui32>& getLCP() const
     {
-        getAlphabetSize(is_alphabet_small);
-        buildSuffixArray();
-    }
-    
-    size_t size() const
-    {
-        return str.size();
-    }
-    
-    const vector<ui32>& getArray()
-    {
-        if (suffix_array.empty())
-        {
-            suffix_array = vector<ui32>(0, str.size());
-            buildSuffixArray();
-        }
-        
-        return suffix_array;
-    }
-    
-    const vector<ui32>& getLCP()
-    {
-        if (lcp.empty())
-        {
-            calcLCP();
-        }
-        
         return lcp;
     }
     

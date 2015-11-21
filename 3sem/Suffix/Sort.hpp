@@ -25,27 +25,27 @@ class GetIntegerDigit: public IGetDigit<ui32>
     
 public:
     GetIntegerDigit ()
-    : power(1)
+    : power(0)
     {
     }
     
     ui32 operator () (const ui32 &a) const
     {
-        return (a / power) % 10;
+        return (a >> power) & 7;
     }
     
     bool next()
     {
-        if (power == 1000000000)
+        if (power == 30)
             return false;
             
-        power *= 10;
+        power += 3;
         return true;
     }
     
     ui32 getAlphabetSize() const
     {
-        return 10;
+        return 8;
     }
 };
 
@@ -59,7 +59,7 @@ void countingSort(Iterator begin, Iterator end, GetDigit get_digit)
     
     for (Iterator it = begin; it != end; ++it)
     {
-        assert(get_digit(*it) < get_digit.getAlphabetSize());
+        //~ assert(get_digit(*it) < get_digit.getAlphabetSize());
         ++buckets[get_digit(*it) + 1];
     }
     

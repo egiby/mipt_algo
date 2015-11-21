@@ -28,7 +28,7 @@ public:
     
     bool next()
     {
-        if (index == 0)
+        if (!index)
             return false;
         
         index--;
@@ -41,9 +41,9 @@ public:
     }
 };
 
-ui32 getElement(ui32 i, const vector<ui32> &a)
+ui32 getElement(ui32 i, const vector<ui32> &a, ui32 inc = 0)
 {
-    return i < a.size() ? a[i] + 1 : 0;
+    return i < a.size() ? a[i] + inc : 0;
 }
 
 #endif
