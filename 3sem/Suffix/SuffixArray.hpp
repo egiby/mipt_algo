@@ -145,16 +145,6 @@ class SuffixArray
         return new_str;
     }
     
-    array<ui32, 3> makeTriple(ui32 i, const vector<ui32> &rank)
-    {
-        array<ui32, 3> triple;
-        triple[0] = str[i];
-        triple[1] = getElement(i + 1, str);
-        triple[2] = getElement(i + 2, rank);
-        
-        return triple;
-    }
-    
     void buildSuffixArray()
     {
         if (str.size() <= 1)
@@ -206,6 +196,7 @@ class SuffixArray
         std::merge(array_1_2.begin() + (str.size() % 3 == 1), array_1_2.end(), array_0.begin(), array_0.end(),
         pre_array.begin(), cmp);
         
+        // It is win!
         for (ui32 i = 0; i < str.size(); ++i)
             suffix_array[i] = pre_array[i].first;
     }

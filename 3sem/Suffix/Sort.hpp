@@ -1,3 +1,6 @@
+#ifndef _COUNTINGSORT
+#define _COUNTINGSORT
+
 #include <algorithm>
 #include <vector>
 #include <cassert>
@@ -79,3 +82,5 @@ void LSDSort(Iterator begin, Iterator end, GetDigit get_digit = GetDigit())
     }
     while (get_digit.next());
 }
+
+#endif
