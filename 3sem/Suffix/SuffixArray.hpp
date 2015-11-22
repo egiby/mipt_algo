@@ -80,7 +80,7 @@ public:
     {
         return alphabet_size;
     }
-}
+};
 
 class SuffixArray
 {
@@ -94,7 +94,7 @@ class SuffixArray
     {
         vector<ui32> alphabet(str);
         
-        LSDSort(alphabet.begin(), alphabet.end());
+        LSDSort(alphabet);
         
         unordered_map<ui32, ui32> ch;
         
@@ -138,7 +138,7 @@ class SuffixArray
             triples.push_back(make_pair(triple, i));
         }
         
-        LSDSort(triples.begin(), triples.end(), GetArrayDigit<array<ui32, 3> >(alphabet_size));
+        LSDSort(triples, GetArrayDigit<array<ui32, 3> >(alphabet_size));
         
         vector<ui32> new_str(triples.size());
         
@@ -198,7 +198,7 @@ class SuffixArray
                 pairs.push_back(make_pair(str[array_1_2[i].first - 1], array_1_2[i].first - 1));
             }
         
-        countingSort(pairs.begin(), pairs.end(), GetPairFirstDigit(alphabet_size + (str.size() % 3 == 1)));
+        countingSort(pairs, GetPairFirstDigit(alphabet_size + (str.size() % 3 == 1)));
         
         for (ui32 i = 0; i < pairs.size(); ++i)
         {

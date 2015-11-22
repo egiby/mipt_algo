@@ -49,36 +49,36 @@ public:
     }
 };
 
-template<class Iterator, class GetDigit>
-void countingSort(Iterator begin, Iterator end, GetDigit get_digit)
+template<class Type, class GetDigit>
+void countingSort(vector<Type> &array, GetDigit get_digit)
 {
-    if (end <= begin)
+    if (!array.size())
         return;
     
     vector<ui32> buckets(get_digit.getAlphabetSize() + 1);
     
-    for (Iterator it = begin; it != end; ++it)
+    for (auto a: array)
     {
         //~ assert(get_digit(*it) < get_digit.getAlphabetSize());
-        ++buckets[get_digit(*it) + 1];
+        ++buckets[get_digit(a) + 1];
     }
     
     for (ui32 i = 1; i < buckets.size(); ++i)
         buckets[i] += buckets[i - 1];
     
-    vector<typename std::iterator_traits<Iterator>::value_type> new_array(end - begin);
-    for (Iterator it = begin; it != end; ++it)
-        new_array[buckets[get_digit(*it)]++] = *it;
+    vector<Type> new_array(array.size());
+    for (auto a: array)
+        new_array[buckets[get_digit(a)]++] = a;
     
-    std::move(new_array.begin(), new_array.end(), begin);
+    array = new_array;
 }
 
-template<class Iterator, class GetDigit = GetIntegerDigit>
-void LSDSort(Iterator begin, Iterator end, GetDigit get_digit = GetDigit())
+template<class Type, class GetDigit = GetIntegerDigit>
+void LSDSort(vector<Type> &array, GetDigit get_digit = GetDigit())
 {
     do
     {
-        countingSort(begin, end, get_digit);
+        countingSort(array, get_digit);
     }
     while (get_digit.next());
 }
