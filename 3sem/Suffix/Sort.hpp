@@ -31,21 +31,21 @@ public:
     
     ui32 operator () (const ui32 &a) const
     {
-        return (a >> power) & 7;
+        return (a >> power) & 255;
     }
     
     bool next()
     {
-        if (power == 30)
+        if (power == 24)
             return false;
             
-        power += 3;
+        power += 8;
         return true;
     }
     
     ui32 getAlphabetSize() const
     {
-        return 8;
+        return 256;
     }
 };
 
@@ -57,18 +57,18 @@ void countingSort(vector<Type> &array, GetDigit get_digit)
     
     vector<ui32> buckets(get_digit.getAlphabetSize() + 1);
     
-    for (auto a: array)
+    for (ui32 i = 0; i < array.size(); ++i)
     {
         //~ assert(get_digit(*it) < get_digit.getAlphabetSize());
-        ++buckets[get_digit(a) + 1];
+        ++buckets[get_digit(array[i]) + 1];
     }
     
     for (ui32 i = 1; i < buckets.size(); ++i)
         buckets[i] += buckets[i - 1];
     
     vector<Type> new_array(array.size());
-    for (auto a: array)
-        new_array[buckets[get_digit(a)]++] = a;
+    for (ui32 i = 0; i < array.size(); ++i)
+        new_array[buckets[get_digit(array[i])]++] = array[i];
     
     array = new_array;
 }

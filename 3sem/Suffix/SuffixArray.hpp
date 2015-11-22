@@ -124,7 +124,9 @@ class SuffixArray
         if (str.size() % 3 == 1)
             new_size++;
         
-        vector<pair<array<ui32, 3>, ui32> > triples;
+        
+        vector<pair<array<ui32, 3>, ui32> > triples(str.size() - (1 + (str.size() - 1) / 3) + (str.size() % 3 == 1));
+        ui32 idx(0);
         
         for (ui32 i = 0; i + 2 < new_size; ++i)
         {
@@ -135,7 +137,7 @@ class SuffixArray
             for (ui32 j = 0; j < 3; ++j)
                 triple[j] = getElement(i + j, str);
             
-            triples.push_back(make_pair(triple, i));
+            triples[idx++] = make_pair(triple, i);
         }
         
         LSDSort(triples, GetArrayDigit<array<ui32, 3> >(alphabet_size));
@@ -175,34 +177,35 @@ class SuffixArray
         SuffixArray new_array(compressed_str, new_alphabet_size);
         
         // building of array_1_2
-        vector<pair<ui32, bool> > array_1_2;
+        vector<pair<ui32, bool> > array_1_2(new_array.size());
         
         ui32 num_left = (str.size() + 1 + (str.size() % 3 == 1)) / 3;
         
         for (ui32 i = 0; i < new_array.size(); ++i)
         {
             if (new_array[i] < num_left)
-                array_1_2.push_back(make_pair(new_array[i] * 3 + 1, 0));
+                array_1_2[i] = make_pair(new_array[i] * 3 + 1, 0);
             else
-                array_1_2.push_back(make_pair(3 * (new_array[i] - num_left) + 2, 0));
+                array_1_2[i] = make_pair(3 * (new_array[i] - num_left) + 2, 0);
         }
         
         // building of array_0
-        vector<pair<ui32, bool> > array_0;
+        vector<pair<ui32, bool> > array_0(num_left);
         
-        vector<pair<ui32, ui32> > pairs;
+        vector<pair<ui32, ui32> > pairs(num_left);
+        ui32 idx(0);
         
         for (ui32 i = 0; i < array_1_2.size(); ++i)
             if (array_1_2[i].first % 3 == 1)
             {
-                pairs.push_back(make_pair(str[array_1_2[i].first - 1], array_1_2[i].first - 1));
+                pairs[idx++] = make_pair(str[array_1_2[i].first - 1], array_1_2[i].first - 1);
             }
         
         countingSort(pairs, GetPairFirstDigit(alphabet_size + (str.size() % 3 == 1)));
         
         for (ui32 i = 0; i < pairs.size(); ++i)
         {
-            array_0.push_back(make_pair(pairs[i].second, 1));
+            array_0[i] = make_pair(pairs[i].second, 1);
         }
         
         // merging of array_1_2 and array_0
