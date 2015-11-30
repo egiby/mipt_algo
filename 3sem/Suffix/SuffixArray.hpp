@@ -90,33 +90,6 @@ class SuffixArray
     vector<ui32> lcp;
     ui32 alphabet_size;
     
-    ui32 getSmallAlphabet()
-    {
-        vector<ui32> alphabet(str);
-        
-        LSDSort(alphabet);
-        
-        unordered_map<ui32, ui32> ch;
-        
-        for (auto c: alphabet)
-            if (ch.find(c) == ch.end())
-            {
-                ui32 color = ch.size() + 1;
-                ch[c] = color;
-            }
-        
-        for (ui32 i = 0; i < str.size(); ++i)
-            str[i] = ch[str[i]];
-        
-        return ch.size() + 1;
-    }
-    
-    void getAlphabetSize()
-    {
-        if (!alphabet_size)
-            alphabet_size = getSmallAlphabet();
-    }
-    
     vector<ui32> getCompressedString(ui32 &new_alphabet_size)
     {
         ui32 new_size = str.size() + 2;
@@ -237,14 +210,14 @@ public:
     : str(str), suffix_array(suffix_array)
     {
         alphabet_size = 0;
-        getAlphabetSize();
+        getAlphabetSize(alphabet_size, str);
     }
     
     SuffixArray (const vector<ui32> &str)
     : str(str), suffix_array(vector<ui32>(str.size(), 0))
     {
         alphabet_size = 0;
-        getAlphabetSize();
+        getAlphabetSize(alphabet_size, str);
         buildSuffixArray();
     }
     

@@ -55,20 +55,20 @@ void countingSort(vector<Type> &array, GetDigit get_digit)
     if (!array.size())
         return;
     
-    vector<ui32> buckets(get_digit.getAlphabetSize() + 1);
+    vector<ui32> baskets(get_digit.getAlphabetSize() + 1);
     
     for (ui32 i = 0; i < array.size(); ++i)
     {
         //~ assert(get_digit(*it) < get_digit.getAlphabetSize());
-        ++buckets[get_digit(array[i]) + 1];
+        ++baskets[get_digit(array[i]) + 1];
     }
     
-    for (ui32 i = 1; i < buckets.size(); ++i)
-        buckets[i] += buckets[i - 1];
+    for (ui32 i = 1; i < baskets.size(); ++i)
+        baskets[i] += baskets[i - 1];
     
     vector<Type> new_array(array.size());
     for (ui32 i = 0; i < array.size(); ++i)
-        new_array[buckets[get_digit(array[i])]++] = array[i];
+        new_array[baskets[get_digit(array[i])]++] = array[i];
     
     array = new_array;
 }
