@@ -12,15 +12,14 @@ namespace NPushRelableAlgorithm
     {
         void push(NNetwork::NetworkEdge * edge, vector<ui64> &excess)
         {
-            ui32 v = edge->reverse_edge->to;
+            ui32 vertex = edge->getReverseEdge()->to();
             
-            ui64 d = std::min(excess[v], (ui64)edge->capacity - edge->flow);
+            ui64 difference = std::min(excess[vertex], (ui64)edge->getCapacity() - edge->getFlow());
             
-            edge->flow += d;
-            edge->reverse_edge->flow -= d;
+            edge->push(difference);
             
-            excess[v] -= d;
-            excess[edge->to] += d;
+            excess[vertex] -= difference;
+            excess[edge->to()] += difference;
         }
         
         void relabel(ui32 vertex, vector<ui32> &height, const NNetwork::Network &net)
@@ -31,10 +30,10 @@ namespace NPushRelableAlgorithm
             
             for (ui32 i = 0; i < edges.size(); ++i)
             {
-                if (edges[i]->capacity - edges[i]->flow > 0)
+                if (edges[i]->getCapacity() - edges[i]->getFlow() > 0)
                 {
-                    assert(height[edges[i]->to] >= height[vertex]);
-                    new_height = std::min(new_height, height[edges[i]->to]);
+                    assert(height[edges[i]->to()] >= height[vertex]);
+                    new_height = std::min(new_height, height[edges[i]->to()]);
                 }
             }
             
@@ -56,7 +55,7 @@ namespace NPushRelableAlgorithm
                     relabel(vertex, height, net);
                     edge = net.getFirstEdge(vertex);
                 }
-                else if (height[vertex] == height[(*edge)->to] + 1 && (*edge)->capacity - (*edge)->flow > 0)
+                else if (height[vertex] == height[(*edge)->to()] + 1 && (*edge)->getCapacity() - (*edge)->getFlow() > 0)
                 {
                     push(*edge, excess);
                 }
@@ -72,13 +71,13 @@ namespace NPushRelableAlgorithm
             while (1)
             {
                 for (ui32 v = 0; v < net.size(); ++v)
-                    if (v != net.getS() && v != net.getT())
+                    if (v != net.getSource() && v != net.getTarget())
                         discharge(v, net, excess, height);
                 
                 bool is_end = 1;
                 
                 for (ui32 i = 0; i < net.size(); ++i)
-                    is_end &= (excess[i] == 0 || i == net.getS() || i == net.getT());
+                    is_end &= (excess[i] == 0 || i == net.getSource() || i == net.getTarget());
                 
                 if (is_end)
                     break;
@@ -91,17 +90,17 @@ namespace NPushRelableAlgorithm
             vector<ui64> excess(net.size(), 0);
             vector<ui32> height(net.size(), 0);
             
-            height[net.getS()] = net.size();
-            vector<NNetwork::NetworkEdge*> edges = net.getEdges(net.getS());
+            height[net.getSource()] = net.size();
+            vector<NNetwork::NetworkEdge*> edges = net.getEdges(net.getSource());
             
             for (ui32 i = 0; i < edges.size(); ++i)
             {
-                if (edges[i]->to == net.getS())
+                if (edges[i]->to() == net.getSource())
                     continue;
             
-                edges[i]->flow += edges[i]->capacity;
-                excess[edges[i]->to] += edges[i]->capacity;
-                edges[i]->reverse_edge->flow -= edges[i]->capacity;
+                edges[i]->push(edges[i]->getCapacity());
+                
+                excess[edges[i]->to()] += edges[i]->getCapacity();
             }
             
             simpleFor(net, excess, height);

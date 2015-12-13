@@ -19,7 +19,7 @@ namespace NGraph
     class IGraph
     {
     public:
-        virtual vector<TEdge*> getEdges(ui32 vertex) const = 0;
+        virtual const vector<TEdge*>& getEdges(ui32 vertex) const = 0;
         virtual ui32 numberEdges(ui32 vertex) const = 0;
         virtual void insertEdge(ui32 from, TEdge &edge) = 0;
         virtual size_t size() const = 0;
@@ -28,17 +28,23 @@ namespace NGraph
         }
     };
     
-    struct Edge
+    class Edge
     {
-        ui32 to;
-        
+    protected:
+        ui32 vertex;
+    public:
         Edge()
         {
         }
         
-        Edge(ui32 to)
-        : to(to)
+        Edge(ui32 vertex)
+        : vertex(vertex)
         {
+        }
+        
+        ui32 to() const
+        {
+            return vertex;
         }
         
         virtual ~Edge()
@@ -63,7 +69,7 @@ namespace NGraph
             graph.resize(graph_size);
         }
         
-        vector<TEdge*> getEdges(ui32 vertex) const
+        const vector<TEdge*>& getEdges(ui32 vertex) const
         {
             return graph[vertex];
         }

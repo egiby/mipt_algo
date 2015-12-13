@@ -7,35 +7,72 @@ namespace NNetwork
 {
     using std::vector;
     
-    struct NetworkEdge: public NGraph::Edge
+    class NetworkEdge;
+    class Network;
+    
+    class NetworkEdge: public NGraph::Edge
     {
         ui32 capacity;
-        int flow;
         NetworkEdge * reverse_edge;
+        int flow;
         
-        NetworkEdge(ui32 vertex, ui32 _capacity)
+    public:
+        NetworkEdge(ui32 _vertex, ui32 capacity)
+        : capacity(capacity), flow(0)
         {
-            flow = 0;
-            to = vertex;
-            capacity = _capacity;
+            vertex = _vertex;
         }
+        
+        ui32 getCapacity() const
+        {
+            return capacity;
+        }
+        
+        int getFlow() const
+        {
+            return flow;
+        }
+        
+        void push(int difference)
+        {
+            flow += difference;
+            reverse_edge->flow -= difference;
+        }
+        
+        NetworkEdge * getReverseEdge() const
+        {
+            return reverse_edge;
+        }
+        
+        friend Network;
     };
     
     class Network: public NGraph::Graph<NetworkEdge>
     {
     protected:
-        ui32 s, t;
+        ui32 source, target;
+        bool is_cleaning_necessary;
         
         Network()
+        : is_cleaning_necessary(1)
         {
         }
         
+        void clean()
+        {
+            if (!is_cleaning_necessary)
+                return;
+            for (ui32 v = 0; v < size(); ++v)
+                for (ui32 i = 0; i < graph[v].size(); ++i)
+                    if (!graph[v][i]->getCapacity())
+                        delete graph[v][i];
+        }
     public:
         
-        Network(ui32 n, ui32 s, ui32 t)
-        : s(s), t(t)
+        Network(ui32 number, ui32 source, ui32 target)
+        : source(source), target(target), is_cleaning_necessary(1)
         {
-            graph.resize(n);
+            graph.resize(number);
         }
         
         void insertEdge(ui32 v, NetworkEdge &edge)
@@ -50,7 +87,7 @@ namespace NNetwork
             reversed->flow = -to->flow;
             
             graph[v].push_back(to);
-            graph[edge.to].push_back(reversed);
+            graph[edge.to()].push_back(reversed);
         }
         
         vector<NetworkEdge*>::iterator getFirstEdge(ui32 v)
@@ -65,7 +102,7 @@ namespace NNetwork
         
         long long getFlow() const
         {
-            vector<NetworkEdge*> edges = graph[s];
+            vector<NetworkEdge*> edges = graph[source];
             
             long long flow = 0;
             
@@ -75,26 +112,19 @@ namespace NNetwork
             return flow;
         }
         
-        ui32 getT() const
+        ui32 getTarget() const
         {
-            return t;
+            return target;
         }
         
-        ui32 getS() const
+        ui32 getSource() const
         {
-            return s;
-        }
-        
-        void clear()
-        {
-            for (ui32 v = 0; v < size(); ++v)
-                for (ui32 i = 0; i < graph[v].size(); ++i)
-                    if (graph[v][i]->capacity)
-                        delete graph[v][i];
+            return source;
         }
         
         ~Network()
         {
+            clean();
         }
     };
 }

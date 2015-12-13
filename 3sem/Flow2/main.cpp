@@ -1,5 +1,5 @@
 #include "MKMAlgorithm.hpp"
-#include "PushRelabel.hpp"
+//~ #include "PushRelabel.hpp"
 
 #include <cstdio>
 
@@ -25,15 +25,15 @@ int main()
     for (ui32 i = 0; i < m; ++i)
         net.insertEdge(edges[i].first, edges[i].second);
     
-    //~ NSearchingBlockingFlowAlgorithm::SearchingBlockingFlowAlgorithm searcher;
-    NPushRelableAlgorithm::PushRelableAlgorithm searcher;
+    NSearchingBlockingFlowAlgorithm::SearchingBlockingFlowAlgorithm searcher;
+    //~ NPushRelableAlgorithm::PushRelableAlgorithm searcher;
     searcher.searchMaxFlow(net);
     
     std::cout << net.getFlow() << '\n';
     
     for (ui32 i = 0; i < m; ++i)
     {
-        std::cout << edges[i].second.flow << '\n';
+        std::cout << edges[i].second.getFlow()<< '\n';
     }
     
     return 0;

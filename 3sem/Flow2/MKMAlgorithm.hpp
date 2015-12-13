@@ -17,8 +17,8 @@ namespace NSearchingBlockingFlowAlgorithm
         
         enum FlowDirection
         {
-            TO_LEFT,
-            TO_RIGHT
+            BACKWARD,
+            FORWARD
         };
         
         LayredNetwork()
@@ -28,8 +28,8 @@ namespace NSearchingBlockingFlowAlgorithm
         void bfs(const NNetwork::Network * net)
         {
             queue<ui32> bfs_queue;
-            distance[net->getS()] = 0;
-            bfs_queue.push(net->getS());
+            distance[net->getSource()] = 0;
+            bfs_queue.push(net->getSource());
             
             while (!bfs_queue.empty())
             {
@@ -40,10 +40,11 @@ namespace NSearchingBlockingFlowAlgorithm
                 
                 for (ui32 i = 0; i < edges.size(); ++i)
                 {
-                    if (distance[vertex] + 1 < distance[edges[i]->to] && edges[i]->capacity - edges[i]->flow > 0)
+                    if (distance[vertex] + 1 < distance[edges[i]->to()] && 
+                    edges[i]->getCapacity() - edges[i]->getFlow() > 0)
                     {
-                        distance[edges[i]->to] = distance[vertex] + 1;
-                        bfs_queue.push(edges[i]->to);
+                        distance[edges[i]->to()] = distance[vertex] + 1;
+                        bfs_queue.push(edges[i]->to());
                     }
                 }
             }
@@ -51,9 +52,9 @@ namespace NSearchingBlockingFlowAlgorithm
         
         bool isEdgeNotReversed(const NNetwork::NetworkEdge * edge)
         {
-            ui32 v = edge->reverse_edge->to;
+            ui32 v = edge->getReverseEdge()->to();
             
-            return distance[v] + 1 == distance[edge->to];
+            return distance[v] + 1 == distance[edge->to()];
         }
         
         void getPotentials()
@@ -66,8 +67,8 @@ namespace NSearchingBlockingFlowAlgorithm
                 {
                     if (isEdgeNotReversed(edges[i]))
                     {
-                        potential_to[edges[i]->to] += edges[i]->capacity - edges[i]->flow;
-                        potential_from[v] += edges[i]->capacity - edges[i]->flow;
+                        potential_to[edges[i]->to()] += edges[i]->getCapacity() - edges[i]->getFlow();
+                        potential_from[v] += edges[i]->getCapacity() - edges[i]->getFlow();
                     }
                 }
             }
@@ -77,15 +78,17 @@ namespace NSearchingBlockingFlowAlgorithm
         {
             bfs(net);
             
-            s = net->getS();
-            t = net->getT();
+            source = net->getSource();
+            target = net->getTarget();
+            
+            is_cleaning_necessary = 0;
             
             for (ui32 v = 0; v < net->size(); ++v)
             {
                 vector<NNetwork::NetworkEdge*> edges = net->getEdges(v);
                 for (ui32 i = 0; i < edges.size(); ++i)
                 {
-                    if (distance[v] + 1 == distance[edges[i]->to])
+                    if (distance[v] + 1 == distance[edges[i]->to()])
                         insertEdge(v, *edges[i]);
                 }
             }
@@ -93,10 +96,10 @@ namespace NSearchingBlockingFlowAlgorithm
         
         ui64 calcPotencial(ui32 vertex)
         {
-            if (vertex == getS())
+            if (vertex == getSource())
                 return potential_from[vertex];
                 
-            if (vertex == getT())
+            if (vertex == getTarget())
                 return potential_to[vertex];
                 
             return std::min(potential_to[vertex], potential_from[vertex]);
@@ -123,13 +126,14 @@ namespace NSearchingBlockingFlowAlgorithm
             
             for (ui32 i = 0; i < edges.size(); ++i)
             {
-                if (!is_exist[edges[i]->to])
+                if (!is_exist[edges[i]->to()])
                     continue;
                 
                 if (isEdgeNotReversed(edges[i]))
-                    potential_to[edges[i]->to] -= edges[i]->capacity - edges[i]->flow;
+                    potential_to[edges[i]->to()] -= edges[i]->getCapacity() - edges[i]->getFlow();
                 else
-                    potential_from[edges[i]->to] -= edges[i]->reverse_edge->capacity - edges[i]->reverse_edge->flow;
+                    potential_from[edges[i]->to()] -= edges[i]->getReverseEdge()->getCapacity() - 
+                    edges[i]->getReverseEdge()->getFlow();
             }
             
             potential_from[vertex] = 0;
@@ -140,32 +144,32 @@ namespace NSearchingBlockingFlowAlgorithm
         
         long long push(NNetwork::NetworkEdge * edge, const vector<ui64> &excess, FlowDirection direction)
         {
-            ui32 v = edge->reverse_edge->to;
+            ui32 v = edge->getReverseEdge()->to();
             
-            long long d;
-            if (direction == TO_RIGHT)
-                d = std::min((long long)excess[v], (long long)edge->capacity - edge->flow);
+            long long difference;
+            if (direction == FORWARD)
+                difference = std::min((long long)excess[v], (long long)edge->getCapacity() - edge->getFlow());
             else
-                d = -std::min((long long)excess[v], (long long)edge->reverse_edge->capacity - edge->reverse_edge->flow);
+                difference = -std::min((long long)excess[v], 
+                (long long)edge->getReverseEdge()->getCapacity() - edge->getReverseEdge()->getFlow());
             
-            edge->flow += d;
-            edge->reverse_edge->flow -= d;
+            edge->push(difference);
             
-            if (direction == TO_LEFT)
-                d = -d;
+            if (direction == BACKWARD)
+                difference = -difference;
             
-            if (direction == TO_RIGHT)
+            if (direction == FORWARD)
             {
-                potential_to[edge->to] -= d;
-                potential_from[v] -= d;
+                potential_to[edge->to()] -= difference;
+                potential_from[v] -= difference;
             }
             else
             {
-                potential_to[v] -= d;
-                potential_from[edge->to] -= d;
+                potential_to[v] -= difference;
+                potential_from[edge->to()] -= difference;
             }
             
-            return d;
+            return difference;
         }
         
         void pushFlow(ui32 vertex, FlowDirection direction, const ui64 potential)
@@ -188,21 +192,27 @@ namespace NSearchingBlockingFlowAlgorithm
                     if (excess[v] == 0)
                         break;
                     
-                    if (!is_exist[edges[i]->to])
+                    if (!is_exist[edges[i]->to()])
                         continue;
                     
-                    if ((isEdgeNotReversed(edges[i]) && direction == TO_RIGHT) ||
-                    (!isEdgeNotReversed(edges[i]) && direction == TO_LEFT))
+                    if ((isEdgeNotReversed(edges[i]) && direction == FORWARD) ||
+                    (!isEdgeNotReversed(edges[i]) && direction == BACKWARD))
                     {
                         long long d = push(edges[i], excess, direction);
                         if (d)
-                            q.push(edges[i]->to);
+                            q.push(edges[i]->to());
                         
                         excess[v] -= d;
-                        excess[edges[i]->to] += d;
+                        excess[edges[i]->to()] += d;
                     }
                 }
             }
+        }
+        
+        void clear()
+        {
+            std::cerr << "LayredNetwork\n";
+            return;
         }
         
     public:
@@ -224,8 +234,8 @@ namespace NSearchingBlockingFlowAlgorithm
                 
                 ui64 potential = calcPotencial(vertex);
                 
-                pushFlow(vertex, TO_RIGHT, potential);
-                pushFlow(vertex, TO_LEFT, potential);
+                pushFlow(vertex, FORWARD, potential);
+                pushFlow(vertex, BACKWARD, potential);
                 
                 assert(calcPotencial(vertex) == 0);
                 
@@ -236,12 +246,12 @@ namespace NSearchingBlockingFlowAlgorithm
         void insertEdge(ui32 from, NNetwork::NetworkEdge &edge)
         {
             graph[from].push_back(&edge);
-            graph[edge.to].push_back(edge.reverse_edge);
+            graph[edge.to()].push_back(edge.getReverseEdge());
         }
         
         bool isPathExists() const
         {
-            return distance[getT()] != UINT_MAX;
+            return distance[getTarget()] != UINT_MAX;
         }
     };
     
