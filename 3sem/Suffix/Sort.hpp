@@ -74,7 +74,7 @@ void countingSort(vector<Type> &array, GetDigit get_digit)
 }
 
 template<class Type, class GetDigit = GetIntegerDigit>
-void LSDSort(vector<Type> &array, GetDigit get_digit = GetDigit())
+void DigitalSort(vector<Type> &array, GetDigit get_digit = GetDigit())
 {
     do
     {

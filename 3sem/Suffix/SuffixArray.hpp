@@ -5,7 +5,6 @@
 
 #include <vector>
 #include <array>
-#include <unordered_map>
 #include <climits>
 #include <cassert>
 
@@ -15,27 +14,26 @@ using std::cerr;
 using std::vector;
 using std::array;
 using std::pair;
-using std::unordered_map;
 using std::make_pair;
 
 class MergeCompare
 {
-    const vector<ui32>& str;
+    const vector<ui32>& string;
     const vector<ui32>& rank_1_2;
     
     array<ui32, 3> makeTriple(ui32 i)
     {
         array<ui32, 3> triple;
-        triple[0] = str[i];
-        triple[1] = getElement(i + 1, str, 1);
+        triple[0] = string[i];
+        triple[1] = getElement(i + 1, string, 1);
         triple[2] = getElement(i + 2, rank_1_2, 1);
         
         return triple;
     }
     
 public:
-    MergeCompare (const vector<ui32> &str, const vector<ui32> &rank_1_2)
-    : str(str), rank_1_2(rank_1_2)
+    MergeCompare (const vector<ui32> &string, const vector<ui32> &rank_1_2)
+    : string(string), rank_1_2(rank_1_2)
     {
     }
     
@@ -48,8 +46,8 @@ public:
             std::swap(l, r);
         
         if (l % 3 == 1)
-            result = make_pair(str[l], getElement(l + 1, rank_1_2, 1)) < 
-            make_pair(str[r], getElement(r + 1, rank_1_2, 1));
+            result = make_pair(string[l], getElement(l + 1, rank_1_2, 1)) < 
+            make_pair(string[r], getElement(r + 1, rank_1_2, 1));
         else
             result = makeTriple(l) < makeTriple(r);
         
@@ -84,21 +82,21 @@ public:
 
 class SuffixArray
 {
-    vector<ui32> str;
+    vector<ui32> string;
     
     vector<ui32> suffix_array;
     vector<ui32> lcp;
     ui32 alphabet_size;
     
-    vector<ui32> getCompressedString(ui32 &new_alphabet_size)
+    vector<ui32> getCompressedString(ui32 &new_alphabet_size) const
     {
-        ui32 new_size = str.size() + 2;
+        ui32 new_size = string.size() + 2;
         
-        if (str.size() % 3 == 1)
+        if (string.size() % 3 == 1)
             new_size++;
         
         
-        vector<pair<array<ui32, 3>, ui32> > triples(str.size() - (1 + (str.size() - 1) / 3) + (str.size() % 3 == 1));
+        vector<pair<array<ui32, 3>, ui32> > triples(string.size() - (1 + (string.size() - 1) / 3) + (string.size() % 3 == 1));
         ui32 idx(0);
         
         for (ui32 i = 0; i + 2 < new_size; ++i)
@@ -108,16 +106,16 @@ class SuffixArray
                 
             array<ui32, 3> triple;
             for (ui32 j = 0; j < 3; ++j)
-                triple[j] = getElement(i + j, str);
+                triple[j] = getElement(i + j, string);
             
             triples[idx++] = make_pair(triple, i);
         }
         
-        LSDSort(triples, GetArrayDigit<array<ui32, 3> >(alphabet_size));
+        DigitalSort(triples, GetArrayDigit<array<ui32, 3> >(alphabet_size));
         
         vector<ui32> new_str(triples.size());
         
-        ui32 color = 1, num_left = (str.size() + 1 + (str.size() % 3  == 1)) / 3;
+        ui32 color = 1, num_left = (string.size() + 1 + (string.size() % 3  == 1)) / 3;
         
         for (ui32 i = 0; i < triples.size(); ++i)
         {
@@ -137,23 +135,8 @@ class SuffixArray
         return new_str;
     }
     
-    void buildSuffixArray()
+    void buildArray12(vector<pair<ui32, bool> > &array_1_2, const SuffixArray &new_array, ui32 num_left) const
     {
-        if (str.size() <= 1)
-            return;
-        
-        // recursion
-        ui32 new_alphabet_size(0);
-        
-        vector<ui32> compressed_str = getCompressedString(new_alphabet_size);
-        
-        SuffixArray new_array(compressed_str, new_alphabet_size);
-        
-        // building of array_1_2
-        vector<pair<ui32, bool> > array_1_2(new_array.size());
-        
-        ui32 num_left = (str.size() + 1 + (str.size() % 3 == 1)) / 3;
-        
         for (ui32 i = 0; i < new_array.size(); ++i)
         {
             if (new_array[i] < num_left)
@@ -161,93 +144,96 @@ class SuffixArray
             else
                 array_1_2[i] = make_pair(3 * (new_array[i] - num_left) + 2, 0);
         }
-        
-        // building of array_0
-        vector<pair<ui32, bool> > array_0(num_left);
-        
-        vector<pair<ui32, ui32> > pairs(num_left);
+    }
+    
+    void buildArray0(vector<pair<ui32, bool> > &array_0, const vector<pair<ui32, bool> > &array_1_2) const
+    {
+        vector<pair<ui32, ui32> > pairs(array_0.size());
         ui32 idx(0);
         
         for (ui32 i = 0; i < array_1_2.size(); ++i)
             if (array_1_2[i].first % 3 == 1)
             {
-                pairs[idx++] = make_pair(str[array_1_2[i].first - 1], array_1_2[i].first - 1);
+                pairs[idx++] = make_pair(string[array_1_2[i].first - 1], array_1_2[i].first - 1);
             }
         
-        countingSort(pairs, GetPairFirstDigit(alphabet_size + (str.size() % 3 == 1)));
+        countingSort(pairs, GetPairFirstDigit(alphabet_size + (string.size() % 3 == 1)));
         
         for (ui32 i = 0; i < pairs.size(); ++i)
         {
             array_0[i] = make_pair(pairs[i].second, 1);
         }
-        
-        // merging of array_1_2 and array_0
-        vector<ui32> rank_1_2(str.size() + (str.size() % 3 == 1));
+    }
+    
+    void mergeArrays(const vector<pair<ui32, bool> > &array_0, const vector<pair<ui32, bool> > &array_1_2)
+    {
+        vector<ui32> rank_1_2(string.size() + (string.size() % 3 == 1));
         
         for (ui32 i = 0; i < array_1_2.size(); ++i)
             rank_1_2[array_1_2[i].first] = i;
 
-        vector<pair<ui32, bool> > pre_array(str.size());
+        vector<pair<ui32, bool> > pre_array(string.size());
         
-        MergeCompare cmp(str, rank_1_2);
-        std::merge(array_1_2.begin() + (str.size() % 3 == 1), array_1_2.end(), array_0.begin(), array_0.end(),
+        MergeCompare cmp(string, rank_1_2);
+        std::merge(array_1_2.begin() + (string.size() % 3 == 1), array_1_2.end(), array_0.begin(), array_0.end(),
         pre_array.begin(), cmp);
         
         // It is win!
-        for (ui32 i = 0; i < str.size(); ++i)
+        for (ui32 i = 0; i < string.size(); ++i)
             suffix_array[i] = pre_array[i].first;
     }
     
-    SuffixArray (const vector<ui32> &str, ui32 _alphabet_size)
-    : str(str), suffix_array(vector<ui32>(str.size(), 0))
+    void buildSuffixArray()
+    {
+        if (string.size() <= 1)
+            return;
+        
+        getAlphabetSize(alphabet_size, string);
+        
+        // recursion
+        ui32 new_alphabet_size(0);
+        
+        vector<ui32> compressed_str = getCompressedString(new_alphabet_size);
+        SuffixArray new_array(compressed_str, new_alphabet_size);
+        
+        // building of array_1_2
+        vector<pair<ui32, bool> > array_1_2(new_array.size());
+        
+        ui32 num_left = (string.size() + 1 + (string.size() % 3 == 1)) / 3;
+        buildArray12(array_1_2, new_array, num_left);
+        
+        // building of array_0
+        vector<pair<ui32, bool> > array_0(num_left);
+        buildArray0(array_0, array_1_2);
+        
+        // merging of array_1_2 and array_0
+        mergeArrays(array_0, array_1_2);
+    }
+    
+    SuffixArray (const vector<ui32> &string, ui32 _alphabet_size)
+    : string(string), suffix_array(vector<ui32>(string.size(), 0))
     {
         alphabet_size = _alphabet_size;
         buildSuffixArray();
     }
     
-public:
-    SuffixArray (const vector<ui32> &str, const vector<ui32> &suffix_array)
-    : str(str), suffix_array(suffix_array)
-    {
-        alphabet_size = 0;
-        getAlphabetSize(alphabet_size, str);
-    }
-    
-    SuffixArray (const vector<ui32> &str)
-    : str(str), suffix_array(vector<ui32>(str.size(), 0))
-    {
-        alphabet_size = 0;
-        getAlphabetSize(alphabet_size, str);
-        buildSuffixArray();
-    }
-    
-    size_t size() const
-    {
-        return str.size();
-    }
-    
-    const vector<ui32>& getArray() const
-    {
-        return suffix_array;
-    }
-    
     void calcLCP()
     {
-        vector<ui32> rank(str.size());
+        vector<ui32> rank(string.size());
         
         for (ui32 i = 0; i < suffix_array.size(); ++i)
             rank[suffix_array[i]] = i;
             
         ui32 last = 0;
         
-        lcp.resize(str.size(), 0);
+        lcp.resize(string.size(), 0);
         
-        for (ui32 i = 0; i < str.size(); ++i)
+        for (ui32 i = 0; i < string.size(); ++i)
         {
             if (last > 0)
                 last--;
                 
-            if (rank[i] == str.size() - 1)
+            if (rank[i] == string.size() - 1)
             {
                 last = 0;
                 continue;
@@ -255,15 +241,39 @@ public:
             
             ui32 j = suffix_array[rank[i] + 1];
             
-            while (std::max(i + last, j + last) < str.size() && str[i + last] == str[j + last])
+            while (std::max(i + last, j + last) < string.size() && string[i + last] == string[j + last])
                 last++;
             
             lcp[rank[i]] = last;
         }
     }
     
-    const vector<ui32>& getLCP() const
+public:
+    explicit SuffixArray (const vector<ui32> &_string)
+    : string(_string), suffix_array(vector<ui32>(string.size(), 0)), lcp(vector<ui32>()), alphabet_size(0)
     {
+        buildSuffixArray();
+    }
+    
+    SuffixArray (const vector<ui32> &_string, const vector<ui32> &suffix_array)
+    : string(_string), suffix_array(suffix_array), lcp(vector<ui32>()), alphabet_size(0)
+    {
+    }
+    
+    size_t size() const
+    {
+        return string.size();
+    }
+    
+    const vector<ui32>& getArray() const
+    {
+        return suffix_array;
+    }
+    
+    const vector<ui32>& getLCP()
+    {
+        if (lcp.empty())
+            calcLCP();
         return lcp;
     }
     

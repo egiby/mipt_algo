@@ -3,6 +3,9 @@
 
 #include "Sort.hpp"
 
+#include <unordered_map>
+using std::unordered_map;
+
 typedef unsigned int ui32;
 
 template<class Array>
@@ -46,31 +49,31 @@ ui32 getElement(ui32 i, const vector<ui32> &a, ui32 inc = 0)
     return i < a.size() ? a[i] + inc : 0;
 }
 
-ui32 getSmallAlphabet(vector<ui32> &str)
+ui32 getSmallAlphabet(vector<ui32> &string)
 {
-    vector<ui32> alphabet(str);
+    vector<ui32> alphabet(string);
     
-    LSDSort(alphabet);
+    DigitalSort(alphabet);
     
-    unordered_map<ui32, ui32> ch;
+    unordered_map<ui32, ui32> mapping;
     
     for (auto c: alphabet)
-        if (ch.find(c) == ch.end())
+        if (mapping.find(c) == mapping.end())
         {
-            ui32 color = ch.size() + 1;
-            ch[c] = color;
+            ui32 color = mapping.size() + 1;
+            mapping[c] = color;
         }
     
-    for (ui32 i = 0; i < str.size(); ++i)
-        str[i] = ch[s[i]];
+    for (ui32 i = 0; i < string.size(); ++i)
+        string[i] = mapping[string[i]];
     
-    return ch.size() + 1;
+    return mapping.size() + 1;
 }
 
-void getAlphabetSize(ui32 &alphabet_size, vector<ui32> &str)
+void getAlphabetSize(ui32 &alphabet_size, vector<ui32> &string)
 {
     if (!alphabet_size)
-        alphabet_size = getSmallAlphabet(str);
+        alphabet_size = getSmallAlphabet(string);
 }
 
 #endif
