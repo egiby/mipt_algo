@@ -37,21 +37,21 @@ public:
     {
     }
     
-    bool operator () (const pair<ui32, bool> &l_p, const pair<ui32, bool> &r_p)
+    bool operator () (const pair<ui32, bool> &left_pair, const pair<ui32, bool> &right_pair)
     {
         bool result = 0;
-        ui32 l = l_p.first;
-        ui32 r = r_p.first;
-        if (l_p.second)
-            std::swap(l, r);
+        ui32 left = left_pair.first;
+        ui32 right = right_pair.first;
+        if (left_pair.second)
+            std::swap(left, right);
         
-        if (l % 3 == 1)
-            result = make_pair(string[l], getElement(l + 1, rank_1_2, 1)) < 
-            make_pair(string[r], getElement(r + 1, rank_1_2, 1));
+        if (left % 3 == 1)
+            result = make_pair(string[left], getElement(left + 1, rank_1_2, 1)) < 
+            make_pair(string[right], getElement(right + 1, rank_1_2, 1));
         else
-            result = makeTriple(l) < makeTriple(r);
+            result = makeTriple(left) < makeTriple(right);
         
-        return result ^ l_p.second;
+        return result ^ left_pair.second;
     }
 };
 
@@ -97,7 +97,7 @@ class SuffixArray
         
         
         vector<pair<array<ui32, 3>, ui32> > triples(string.size() - (1 + (string.size() - 1) / 3) + (string.size() % 3 == 1));
-        ui32 idx(0);
+        ui32 index(0);
         
         for (ui32 i = 0; i + 2 < new_size; ++i)
         {
@@ -108,7 +108,7 @@ class SuffixArray
             for (ui32 j = 0; j < 3; ++j)
                 triple[j] = getElement(i + j, string);
             
-            triples[idx++] = make_pair(triple, i);
+            triples[index++] = make_pair(triple, i);
         }
         
         DigitalSort(triples, GetArrayDigit<array<ui32, 3> >(alphabet_size));
@@ -122,7 +122,7 @@ class SuffixArray
             if (i && triples[i].first != triples[i - 1].first)
                 color++;
             
-            ui32 index = triples[i].second / 3;
+            index = triples[i].second / 3;
             
             if (triples[i].second % 3 == 2)
                 index += num_left;
@@ -149,12 +149,12 @@ class SuffixArray
     void buildArray0(vector<pair<ui32, bool> > &array_0, const vector<pair<ui32, bool> > &array_1_2) const
     {
         vector<pair<ui32, ui32> > pairs(array_0.size());
-        ui32 idx(0);
+        ui32 index(0);
         
         for (ui32 i = 0; i < array_1_2.size(); ++i)
             if (array_1_2[i].first % 3 == 1)
             {
-                pairs[idx++] = make_pair(string[array_1_2[i].first - 1], array_1_2[i].first - 1);
+                pairs[index++] = make_pair(string[array_1_2[i].first - 1], array_1_2[i].first - 1);
             }
         
         countingSort(pairs, GetPairFirstDigit(alphabet_size + (string.size() % 3 == 1)));
