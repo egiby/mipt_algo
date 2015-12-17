@@ -18,7 +18,7 @@ namespace NNetwork
         
     public:
         NetworkEdge(ui32 _vertex, ui32 capacity)
-        : capacity(capacity), flow(0)
+        : capacity(capacity), reverse_edge(0), flow(0)
         {
             vertex = _vertex;
         }
@@ -41,6 +41,7 @@ namespace NNetwork
         
         NetworkEdge * getReverseEdge() const
         {
+            assert(reverse_edge);
             return reverse_edge;
         }
         
