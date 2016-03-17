@@ -1,4 +1,4 @@
-#include "futex.hpp"
+#include "Futex.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -38,12 +38,12 @@ void printSums(int number_threads, const long long SUM)
     
     assert(sum == SUM);
     
-    std::cout << std::accumulate(local_sum.begin(), local_sum.end(), 0ll) << '\n';
+    std::cout << "result sum: " << std::accumulate(local_sum.begin(), local_sum.end(), 0ll) << '\n';
     for (auto s: local_sum)
         std::cout << s << '\n';
     std::cout << '\n';
     
-    std::cout << sum << '\n';
+    std::cout << "answer: " << sum << '\n';
     std::cout << std::chrono::duration<double>(end_time - start_time).count() << "s\n";
 }
 
