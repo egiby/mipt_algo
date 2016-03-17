@@ -9,12 +9,12 @@ class ISyncQueue
 public:
     virtual void lock() = 0;
     virtual void unlock() = 0;
-    virtual bool empty() const = 0;
-    virtual size_t size() const = 0;
+    virtual bool empty() = 0;
+    virtual size_t size() = 0;
     virtual void push(const T&) = 0;
     virtual void pop() = 0;
-    virtual const T& front() const = 0;
-    virtual const T& back() const = 0;
+    virtual const T& front() = 0;
+    virtual const T& back() = 0;
     
     virtual ~ISyncQueue()
     {
@@ -40,13 +40,13 @@ public:
         locker.unlock();
     }
     
-    bool empty() const
+    bool empty()
     {
         std::lock_guard<Mutex> l(local_locker);
         return queue.empty();
     }
     
-    size_t size() const
+    size_t size()
     {
         std::lock_guard<Mutex> l(local_locker);
         return queue.size();
@@ -64,13 +64,13 @@ public:
         queue.pop();
     }
     
-    const T& front() const
+    const T& front()
     {
         std::lock_guard<Mutex> l(local_locker);
         return queue.front();
     }
     
-    const T& back() const
+    const T& back()
     {
         std::lock_guard<Mutex> l(local_locker);
         return queue.back();
