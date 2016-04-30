@@ -1,9 +1,14 @@
 #ifndef _PAINTER
 #define _PAINTER
 
-#include "GeometricObject.hpp"
+#include "geometry/Double.hpp"
+#include "geometry/Geometry.hpp"
+
+#include "objects/GeometricObject.hpp"
 #include "objects/Triangle.hpp"
 #include "objects/Parallelogram.hpp"
+
+#include "parsers/DefaultParser.hpp"
 
 #include <png++/png.hpp>
 
@@ -16,174 +21,28 @@
 
 namespace NPainter
 {
-    using namespace NGeometry;
-    using namespace NGeometricObjects;
+    using NGeometry::Point;
+    using NGeometry::Ray;
+    
+    using NDouble::Double;
+    
+    using NGeometricObjects::IGeometricObject;
+    using NGeometricObjects::Color;
+    
+    using NImageSettings::ImageSettings;
+    
+    using NDefaultParser::DefaultParser;
+    
     using std::cerr;
-    
-    struct Screen
-    {
-        Point left_bottom_angle = {3, 0, 3};
-        Vector x_basis = {-0.01, 0, 0};
-        Vector y_basis = {0, 0, 0.04};
-        ui32 x_size = 500, y_size = 500;
-    };
-    
-    struct ImageSettings
-    {
-        Point eye;
-        Screen screen;
-        std::vector<NGeometricObjects::IGeometricObject*> objects;
-        
-        ~ImageSettings()
-        {
-            for (auto object: objects)
-                delete object;
-        }
-    };
-    
-    class IFileParser
-    {
-    public:
-        virtual ImageSettings * parseFile(std::string filename) = 0;
-        virtual ~IFileParser()
-        {
-        }
-    };
-    
-    /*
-     * language:
-     * <point> = <double> <double> <double>
-     * <color> = <uint8_t> <uint8_t> <uint8_t>
-     * <size> = <size_t> <size_t>
-     * <eye> = "eye" <point>
-     * <screen> = "screen" [
-     * (left bottom angle)<point>
-     * (left upper angle)<point>
-     * (right bottom angle)<point>
-     * (size)<size>]
-     * <triangle> = "triangle" [
-     * (vertex)<point>
-     * (side_1)<vector>
-     * (side_2)<vector>
-     * (rgb)<color>]
-     * <parallelogram> = "parallelogram" [
-     * (vertex)<point>
-     * (side_1)<vector>
-     * (side_2)<vector>
-     * (rgb)<color>]
-     */
-    
-    const Point DEFAULT_EYE = {0, -1000000., 0};
-    
-    class DefaultParser: public IFileParser
-    {
-    public:
-        ImageSettings * parseFile(std::string filename)
-        {
-            Point eye = DEFAULT_EYE;
-            Screen screen;
-            std::vector<IGeometricObject*> objects;
-            
-            std::ifstream in(filename);
-            
-            std::string word;
-            while (in >> word)
-            {
-                if (word == "screen")
-                {
-                    Point left_upper, right_bottom;
-                    in >> screen.left_bottom_angle;
-                    in >> left_upper >> right_bottom;
-                    in >> screen.x_size >> screen.y_size;
-                    
-                    screen.x_basis = (-screen.left_bottom_angle + right_bottom) / screen.x_size;
-                    screen.y_basis = (-screen.left_bottom_angle + left_upper) / screen.y_size;
-                }
-                
-                if (word == "eye")
-                {
-                    in >> eye;
-                }
-                
-                if (word == "triangle")
-                {
-                    Point vertex;
-                    Vector side_1, side_2;
-                    in >> vertex >> side_1 >> side_2;
-                    
-                    Color c;
-                    in >> c.red >> c.green >> c.blue;
-                    
-                    objects.push_back(new NTriangle::Triangle(c, vertex, side_1, side_2));
-                }
-                
-                if (word == "parallelogram")
-                {
-                    Point vertex;
-                    Vector side_1, side_2;
-                    in >> vertex >> side_1 >> side_2;
-                    
-                    Color c;
-                    in >> c.red >> c.green >> c.blue;
-                    
-                    objects.push_back(new NParallelogram::Parallelogram(c, vertex, side_1, side_2));
-                }
-                // to be continued...
-            }
-            
-            return new ImageSettings{eye, screen, objects};
-        }
-    };
-    
-    class STLParser: public IFileParser
-    {
-        Point readVertex(std::ifstream &in)
-        {
-            std::string word; 
-            in >> word;
-            //~ cerr << word << '\n';
-            assert(word == "vertex");
-            
-            Point p;
-            in >> p;
-            return p;
-        }
-        
-    public:
-        ImageSettings * parseFile(std::string filename)
-        {
-            Point eye = DEFAULT_EYE;
-            Screen screen;
-            std::vector<IGeometricObject*> objects;
-            srand(501);
-            
-            std::ifstream in(filename);
-            
-            std::string word;
-            
-            while (in >> word)
-            {
-                if (word == "vertex")
-                {
-                    Point v1, v2, v3;
-                    
-                    in >> v1;
-                    v2 = readVertex(in);
-                    v3 = readVertex(in);
-                    
-                    Color color = {(ui32)(rand() % 256), (ui32)(rand() % 256), (ui32)(rand() % 256)};
-                    
-                    objects.push_back(new NTriangle::Triangle(color, v1, v2 - v1, v3 - v1));
-                }
-            }
-            
-            return new ImageSettings{eye, screen, objects};
-        }
-    };
     
     const std::string DEFAULT_OUTPUT_FILE = "rgb.png";
     const std::string DEFAULT_INPUT_FILE = "settings.in";
     const Double MAX_COORDINATE = 1e20;
+    
+    png::rgb_pixel makePixel(const Color &c)
+    {
+        return png::rgb_pixel(c.red, c.green, c.blue);
+    }
     
     class Painter;
     
@@ -200,7 +59,7 @@ namespace NPainter
                    settings->screen.y_basis * (y + 0.5);
         }
         
-        png::rgb_pixel intersectAll(const Ray &ray)
+        std::pair<Point, IGeometricObject*> intersectAll(const Ray &ray)
         {
             Double min_coefficient = MAX_COORDINATE;
             NGeometricObjects::IGeometricObject * first_object = 0;
@@ -220,7 +79,17 @@ namespace NPainter
             }
             
             if (first_object)
-                return png::rgb_pixel(first_object->getRed(), first_object->getGreen(), first_object->getBlue());
+                return std::make_pair(min_coefficient * ray.direction, first_object);
+            
+            return std::make_pair(NGeometry::INFINITY_POINT, first_object);
+        }
+        
+        png::rgb_pixel calcColor(const Ray &ray)
+        {
+            auto result = intersectAll(ray);
+            
+            if (result.second)
+                return makePixel(result.second->getColor());
             
             return png::rgb_pixel(0, 0, 0);
         }
@@ -276,7 +145,7 @@ namespace NPainter
                 Point pixel = painter.calcPixelCenter(x, y);
                 Ray ray(painter.settings->eye, pixel - painter.settings->eye);
                 
-                image[x][y] = painter.intersectAll(ray);
+                image[x][y] = painter.calcColor(ray);
             }
     }
 };

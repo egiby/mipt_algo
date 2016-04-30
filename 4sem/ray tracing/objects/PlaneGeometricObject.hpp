@@ -1,7 +1,9 @@
 #ifndef _PLANE_GEOMETRIC_OBJECT
 #define _PLANE_GEOMETRIC_OBJECT
 
-#include "../GeometricObject.hpp"
+#include "GeometricObject.hpp"
+
+#include <cassert>
 
 namespace NPlaneGeometricObject
 {
@@ -12,19 +14,15 @@ namespace NPlaneGeometricObject
     public:
         virtual NGeometry::Vector normal() const = 0;
         
-        virtual ui32 getRed() const
+        NGeometry::Vector getNormal(const NGeometry::Point &p) const
         {
-            return color.red;
+            assert(p != NGeometry::INFINITY_POINT);
+            return normal();
         }
         
-        virtual ui32 getGreen() const
+        NGeometricObjects::Color getColor() const
         {
-            return color.green;
-        }
-        
-        virtual ui32 getBlue() const
-        {
-            return color.blue;
+            return color;
         }
     };
 };
