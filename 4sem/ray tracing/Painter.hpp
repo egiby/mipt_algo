@@ -16,12 +16,15 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <future>
 
 #include <cstdlib>
+#include <cmath>
 
 namespace NPainter
 {
     using NGeometry::Point;
+    using NGeometry::Vector;
     using NGeometry::Ray;
     
     using NDouble::Double;
@@ -59,7 +62,13 @@ namespace NPainter
                    settings->screen.y_basis * (y + 0.5);
         }
         
-        std::pair<Point, IGeometricObject*> intersectAll(const Ray &ray)
+        struct Intersection
+        {
+            Point point;
+            IGeometricObject * object;
+        };
+        
+        Intersection intersectAll(const Ray &ray)
         {
             Double min_coefficient = MAX_COORDINATE;
             NGeometricObjects::IGeometricObject * first_object = 0;
@@ -78,20 +87,43 @@ namespace NPainter
                 }
             }
             
-            if (first_object)
-                return std::make_pair(min_coefficient * ray.direction, first_object);
+            if (!first_object)
+                return {NGeometry::INFINITY_POINT, first_object};
             
-            return std::make_pair(NGeometry::INFINITY_POINT, first_object);
+            //~ cerr << "coeff: " << std::fixed << min_coefficient << '\n';
+            //~ cerr << std::fixed << ray.start << '\n' << ray.direction << '\n';
+            //~ cerr << std::fixed << min_coefficient * ray.direction << '\n';
+            //~ cerr << ray.start + (min_coefficient * ray.direction) << '\n';
+            
+            return {ray.start + min_coefficient * ray.direction, first_object};
         }
         
         png::rgb_pixel calcColor(const Ray &ray)
         {
             auto result = intersectAll(ray);
             
-            if (result.second)
-                return makePixel(result.second->getColor());
+            if (!result.object)
+                return png::rgb_pixel(0, 0, 0);
             
-            return png::rgb_pixel(0, 0, 0);
+            Double illuminance = 0;
+            
+            for (const auto &source: settings->light_sources)
+            {
+                Ray light_ray = Ray(source.point, result.point - source.point);
+                auto intersection = intersectAll(light_ray);
+                
+                if (intersection.object != result.object)
+                    continue;
+                
+                Vector radius = -(result.point - source.point);
+                Vector normal = result.object->getNormal(result.point);
+                
+                
+                illuminance += source.light_force * std::fabs(radius * normal) / 
+                               (std::pow(abs(radius), 3) * abs(normal));
+            }
+            
+            return makePixel(result.object->getColor() * illuminance);
         }
         
     public:
@@ -108,10 +140,15 @@ namespace NPainter
         
         virtual void paint(std::string result_file = DEFAULT_OUTPUT_FILE)
         {
+        #ifndef _DEBUG
             auto number_threads = std::thread::hardware_concurrency() + 1;
+        #else
+            ui32 number_threads = 1; // debug mode
+        #endif
             png::image<png::rgb_pixel> image(settings->screen.x_size, settings->screen.y_size);
             
             std::vector<std::thread> t(number_threads);
+            //~ std::vector<std::vector<std::future<bool> > >
             
             for (ui32 k = 0; k < number_threads; ++k)
             {
@@ -121,6 +158,7 @@ namespace NPainter
                     last = settings->screen.x_size;
                 
                 t[k] = std::thread(paintPart, first, last, std::ref(image), std::ref(*this));
+                //~ auto handle = std::async(std::launch::async, paintPart, first, last, std::ref(image), std::ref(*this));
             }
             
             for (ui32 i = 0; i < number_threads; ++i)

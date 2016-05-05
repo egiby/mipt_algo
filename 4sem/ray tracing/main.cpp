@@ -8,10 +8,10 @@ using std::cerr;
 
 int main()
 {
-    NPainter::Painter painter("humanoid.stl", new NSTLParser::STLParser());
+    NPainter::Painter painter("magnolia.stl", new NSTLParser::STLParser());
     //~ NPainter::Painter painter;
     cerr << "painter created\n";
-    painter.paint();
+    painter.paint("rgb.png");
     
     return 0;
 }

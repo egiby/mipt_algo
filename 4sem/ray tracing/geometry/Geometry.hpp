@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cmath>
+#include <cassert>
 
 #include <iostream>
 using std::cerr;
@@ -61,7 +62,7 @@ namespace NGeometry
     
     Vector operator ^ (const Vector &v1, const Vector &v2)
     {
-        return {v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.z};
+        return {v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x};
     }
     
     Double abs(const Vector &p)
@@ -134,6 +135,10 @@ namespace NGeometry
             
             if (normal * l.direction == Double(0.))
                 return INFINITY_POINT;
+            
+            //~ cerr.precision(10);
+            //~ cerr << std::fixed << operator () (l.start - l.direction * (normal * normal) / (normal * l.direction)) << '\n';
+            assert(operator () (l.start - l.direction * (normal * normal) / (normal * l.direction)) == Double(0.));
             
             return l.start - l.direction * (normal * normal) / (normal * l.direction); // it must work
         }

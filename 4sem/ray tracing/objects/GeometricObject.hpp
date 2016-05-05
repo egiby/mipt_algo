@@ -9,6 +9,7 @@
 #include <cmath>
 
 #include <iostream>
+#include <algorithm>
 using std::cerr;
 
 namespace NGeometricObjects
@@ -17,6 +18,15 @@ namespace NGeometricObjects
     {
         ui32 red, green, blue;
     };
+    
+    Color operator * (const Color &c, const NDouble::Double &d)
+    {
+        int r = std::min(std::max((int)std::lround(c.red * d), 0), 255),
+            g = std::min(std::max((int)std::lround(c.green * d), 0), 255),
+            b = std::min(std::max((int)std::lround(c.blue * d), 0), 255);
+        
+        return {(ui32)r, (ui32)g, (ui32)b};
+    }
     
     class IGeometricObject
     {

@@ -27,10 +27,10 @@ namespace NImageSettings
         }
     };
     
-    struct LightSourse
+    struct LightSource
     {
-        NDouble::Double light_forse;
-        Point position;
+        NDouble::Double light_force;
+        Point point;
     };
     
     struct ImageSettings
@@ -38,6 +38,7 @@ namespace NImageSettings
         Point eye;
         Screen screen;
         std::vector<NGeometricObjects::IGeometricObject*> objects;
+        std::vector<LightSource> light_sources;
         
         ~ImageSettings()
         {
@@ -46,7 +47,7 @@ namespace NImageSettings
         }
     };
     
-    const Point DEFAULT_EYE = {0, -1000000., 0};
-    const Screen DEFAULT_SCREEN = Screen(Point{0, -10, -10}, Point{0, -10, 10}, Point{0, 10, -10});
+    const Point DEFAULT_EYE = {-100000, 0, 0};
+    const Screen DEFAULT_SCREEN = Screen(Point{-1, -30, -30}, Point{-1, -30, 30}, Point{-1, 30, -30});
 };
 #endif

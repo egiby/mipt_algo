@@ -22,11 +22,13 @@ namespace NTriangle
         
         NDouble::Double intersect(const NGeometry::Ray &ray) const
         {
+            //~ cerr << "intersect\n";
             return intersectConvexPolygon(ray, this);
         }
         
         virtual NGeometry::Vector normal() const
         {
+            assert(NGeometry::abs(side_1 ^ side_2) != 0);
             return side_1 ^ side_2;
         }
         
