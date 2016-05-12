@@ -42,7 +42,6 @@ namespace NPainter
     
     const std::string DEFAULT_OUTPUT_FILE = "rgb.png";
     const std::string DEFAULT_INPUT_FILE = "settings.in";
-    //~ const Double MAX_COORDINATE = NGeometry::INFINITY_POINT.x;
     
     png::rgb_pixel makePixel(const Color &c)
     {
@@ -55,14 +54,11 @@ namespace NPainter
     
     png::rgb_pixel calcColor(const Intersection &result, const ImageSettings * settings)
     {
-        //~ auto result = intersectAll(ray, settings);
-        //~ auto result = Intersection{NGeometry::INFINITY_POINT, nullptr};
-        
         if (result.object == nullptr)
             return png::rgb_pixel(0, 0, 0);
         
-        //~ Double illuminance = 0.1;
         Double illuminance = 0.;
+        //~ Double illuminance = 1;
         
         for (const auto &source: settings->light_sources)
         {

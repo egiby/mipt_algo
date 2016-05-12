@@ -139,7 +139,7 @@ namespace NGeometry
             
             //~ cerr.precision(10);
             //~ cerr << std::fixed << operator () (l.start - l.direction * (normal * normal) / (normal * l.direction)) << '\n';
-            assert(operator () (l.start - l.direction * (normal * normal) / (normal * l.direction)) == Double(0.));
+            //~ assert(operator () (l.start - l.direction * (normal * normal) / (normal * l.direction)) == Double(0.));
             
             return l.start - l.direction * (normal * normal) / (normal * l.direction); // it must work
         }

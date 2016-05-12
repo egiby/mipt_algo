@@ -43,7 +43,7 @@ namespace NDouble
             return value;
         }
     };
-    const double Double::EPS = 1e-4;
+    const double Double::EPS = 1e-6;
     
     bool operator == (const Double &a, const Double &b)
     {

@@ -18,25 +18,42 @@ namespace NConvexPolygon
         virtual size_t size() const = 0;
     };
     
-    bool isPointInConvexPolygon(const Point &p, const ConvexPolygon *polygon)
+    bool isPointInConvexPolygon(const Point &p, const ConvexPolygon &polygon)
     {
         Double s(0.), s_abs(0.);
         
-        for (ui32 i = 0; i < polygon->size(); ++i)
+        for (ui32 i = 0; i < polygon.size(); ++i)
         {
-            
-            Double d = abs(((*polygon)[i] - p) ^ ((*polygon)[(i + 1) % polygon->size()] - p));
+            Double d = abs((polygon[i] - p) ^ (polygon[(i + 1) % polygon.size()] - p));
             s_abs += d;
             
-            if (((((*polygon)[i] - p) ^ ((*polygon)[(i + 1) % polygon->size()] - p)) * polygon->normal()) > Double(0.))
+            ui32 next = (i + 1);
+            if (next >= polygon.size())
+                next -= polygon.size();
+            
+            if ((((polygon[i] - p) ^ (polygon[next] - p)) * polygon.normal()) > Double(0.))
                 s += d;
             else
                 s -= d;
         }
         
-        //~ cerr << s_abs << ' ' << s << '\n';
+        //~ bool is_good = 0;
+        //~ for (ui32 i = 0; i < polygon.size(); ++i)
+        //~ {
+            //~ auto next_1 = (i + 1);
+            //~ if (next_1 >= polygon.size())
+                //~ next_1 -= polygon.size();
+            
+            //~ auto next_2 = (i + 2);
+            //~ if (next_2 >= polygon.size())
+                //~ next_2 -= polygon.size();
+            
+            //~ auto l = (polygon[next_1] - polygon[i]);
+            //~ is_good |= ((p - polygon[i]) ^ l) * ((polygon[next_2] - polygon[i]) ^ l) < Double(0);
+        //~ }
         
         return s_abs == s;
+        //~ return is_good;
     }
     
     double intersectConvexPolygon(const NGeometry::Ray &ray, const ConvexPolygon * polygon)
@@ -53,7 +70,7 @@ namespace NConvexPolygon
         //~ cerr << (*polygon)[0] << '\n';
         //~ cerr << (*polygon)[1] << '\n';
         //~ cerr << (*polygon)[2] << '\n';
-        if (!isPointInConvexPolygon(intersection, polygon))
+        if (!isPointInConvexPolygon(intersection, *polygon))
             return -1.;
         
         return abs(intersection - ray.start) / abs(ray.direction);
