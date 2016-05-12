@@ -14,7 +14,7 @@ namespace NConvexPolygon
     class ConvexPolygon: public PlaneGeometricObject
     {
     public:
-        virtual const Point operator [] (int n) const = 0;
+        virtual const Point& operator [] (int n) const = 0;
         virtual size_t size() const = 0;
     };
     

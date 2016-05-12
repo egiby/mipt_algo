@@ -10,6 +10,8 @@
 
 #include "parsers/DefaultParser.hpp"
 
+#include "calculations/Intersecter.hpp"
+
 #include <png++/png.hpp>
 
 #include <iostream>
@@ -40,7 +42,7 @@ namespace NPainter
     
     const std::string DEFAULT_OUTPUT_FILE = "rgb.png";
     const std::string DEFAULT_INPUT_FILE = "settings.in";
-    const Double MAX_COORDINATE = 1e20;
+    //~ const Double MAX_COORDINATE = NGeometry::INFINITY_POINT.x;
     
     png::rgb_pixel makePixel(const Color &c)
     {
@@ -51,6 +53,39 @@ namespace NPainter
     
     void paintPart(ui32 first, ui32 last, png::image<png::rgb_pixel> &image, Painter &painter);
     
+    png::rgb_pixel calcColor(const Intersection &result, const ImageSettings * settings)
+    {
+        //~ auto result = intersectAll(ray, settings);
+        //~ auto result = Intersection{NGeometry::INFINITY_POINT, nullptr};
+        
+        if (result.object == nullptr)
+            return png::rgb_pixel(0, 0, 0);
+        
+        //~ Double illuminance = 0.1;
+        Double illuminance = 0.;
+        
+        for (const auto &source: settings->light_sources)
+        {
+            Ray light_ray = Ray(source.point, result.point - source.point);
+            auto intersection = intersectAll(light_ray, settings);
+            
+            if (intersection.object != result.object)
+                continue;
+            
+            Vector radius = -(result.point - source.point);
+            Vector normal = result.object->getNormal(result.point);
+            
+            
+            illuminance += source.light_force * std::fabs(radius * normal) / 
+                           (std::pow(abs(radius), 3) * abs(normal));
+        }
+        
+        //~ if (illuminance == Double(0.1))
+            //~ cerr << result.point << '\n';
+        
+        return makePixel(result.object->getColor() * illuminance);
+    }
+    
     class Painter
     {
     protected:
@@ -60,70 +95,6 @@ namespace NPainter
         {
             return settings->screen.left_bottom_angle + settings->screen.x_basis * (x + 0.5) + 
                    settings->screen.y_basis * (y + 0.5);
-        }
-        
-        struct Intersection
-        {
-            Point point;
-            IGeometricObject * object;
-        };
-        
-        Intersection intersectAll(const Ray &ray)
-        {
-            Double min_coefficient = MAX_COORDINATE;
-            NGeometricObjects::IGeometricObject * first_object = 0;
-            
-            for (auto object: settings->objects)
-            {
-                Double coefficient = object->intersect(ray);
-                
-                if (coefficient < Double(0.))
-                    continue;
-                
-                if (coefficient < min_coefficient)
-                {
-                    first_object = object;
-                    min_coefficient = coefficient;
-                }
-            }
-            
-            if (!first_object)
-                return {NGeometry::INFINITY_POINT, first_object};
-            
-            //~ cerr << "coeff: " << std::fixed << min_coefficient << '\n';
-            //~ cerr << std::fixed << ray.start << '\n' << ray.direction << '\n';
-            //~ cerr << std::fixed << min_coefficient * ray.direction << '\n';
-            //~ cerr << ray.start + (min_coefficient * ray.direction) << '\n';
-            
-            return {ray.start + min_coefficient * ray.direction, first_object};
-        }
-        
-        png::rgb_pixel calcColor(const Ray &ray)
-        {
-            auto result = intersectAll(ray);
-            
-            if (!result.object)
-                return png::rgb_pixel(0, 0, 0);
-            
-            Double illuminance = 0;
-            
-            for (const auto &source: settings->light_sources)
-            {
-                Ray light_ray = Ray(source.point, result.point - source.point);
-                auto intersection = intersectAll(light_ray);
-                
-                if (intersection.object != result.object)
-                    continue;
-                
-                Vector radius = -(result.point - source.point);
-                Vector normal = result.object->getNormal(result.point);
-                
-                
-                illuminance += source.light_force * std::fabs(radius * normal) / 
-                               (std::pow(abs(radius), 3) * abs(normal));
-            }
-            
-            return makePixel(result.object->getColor() * illuminance);
         }
         
     public:
@@ -148,7 +119,6 @@ namespace NPainter
             png::image<png::rgb_pixel> image(settings->screen.x_size, settings->screen.y_size);
             
             std::vector<std::thread> t(number_threads);
-            //~ std::vector<std::vector<std::future<bool> > >
             
             for (ui32 k = 0; k < number_threads; ++k)
             {
@@ -158,7 +128,6 @@ namespace NPainter
                     last = settings->screen.x_size;
                 
                 t[k] = std::thread(paintPart, first, last, std::ref(image), std::ref(*this));
-                //~ auto handle = std::async(std::launch::async, paintPart, first, last, std::ref(image), std::ref(*this));
             }
             
             for (ui32 i = 0; i < number_threads; ++i)
@@ -177,14 +146,18 @@ namespace NPainter
     
     void paintPart(ui32 first, ui32 last, png::image<png::rgb_pixel> &image, Painter &painter)
     {
+        //~ cerr << first << ' ' << last << std::endl;
+        //~ cerr << painter.settings->screen.y_size << std::endl;
         for (ui32 x = first; x < last; ++x)
             for (ui32 y = 0; y < painter.settings->screen.y_size; ++y)
             {
                 Point pixel = painter.calcPixelCenter(x, y);
                 Ray ray(painter.settings->eye, pixel - painter.settings->eye);
                 
-                image[x][y] = painter.calcColor(ray);
+                //~ cerr << x << ' ' << y << std::endl;
+                image[y][x] = calcColor(intersectAll(ray, painter.settings), painter.settings);
             }
+        //~ cerr << "done\n";
     }
 };
 

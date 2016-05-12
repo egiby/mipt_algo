@@ -11,13 +11,17 @@ namespace NParallelogram
     
     class Parallelogram: public NConvexPolygon::ConvexPolygon
     {
-        Point vertex;
-        Vector side_1, side_2;
+        Vector normal_vector;
+        Point vertex[4];
     public:
-        Parallelogram(const Color &_color, const Point &vertex, const Vector &side_1, const Vector &side_2)
-        : vertex(vertex), side_1(side_1), side_2(side_2)
+        Parallelogram(const Color &_color, const Point &_vertex, const Vector &side_1, const Vector &side_2)
+        : normal_vector(side_1 ^ side_2)
         {
             color = _color;
+            vertex[0] = _vertex;
+            vertex[1] = _vertex + side_1;
+            vertex[2] = _vertex + side_1 + side_2;
+            vertex[3] = _vertex + side_2;
         }
         
         NDouble::Double intersect(const NGeometry::Ray &ray) const
@@ -25,9 +29,9 @@ namespace NParallelogram
             return NConvexPolygon::intersectConvexPolygon(ray, this);
         }
         
-        virtual NGeometry::Vector normal() const
+        virtual const NGeometry::Vector& normal() const
         {
-            return side_1 ^ side_2;
+            return normal_vector;
         }
         
         size_t size() const
@@ -35,18 +39,9 @@ namespace NParallelogram
             return 4;
         }
         
-        const Point operator [] (int n) const
+        const Point& operator [] (int n) const
         {
-            if (n == 0)
-                return vertex;
-            
-            if (n == 1)
-                return vertex + side_1;
-            
-            if (n == 2)
-                return vertex + side_1 + side_2;
-            
-            return vertex + side_2;
+            return vertex[n];
         }
     };
 };

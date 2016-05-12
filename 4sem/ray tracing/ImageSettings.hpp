@@ -48,6 +48,8 @@ namespace NImageSettings
     };
     
     const Point DEFAULT_EYE = {-100000, 0, 0};
+    //~ const Point DEFAULT_EYE = {0, -100000, 0};
     const Screen DEFAULT_SCREEN = Screen(Point{-1, -30, -30}, Point{-1, -30, 30}, Point{-1, 30, -30});
+    //~ const Screen DEFAULT_SCREEN = Screen(Point{-30, -20, -30}, Point{-30, -20, 30}, Point{30, -20, -30});
 };
 #endif

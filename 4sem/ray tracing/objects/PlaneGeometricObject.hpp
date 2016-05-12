@@ -12,7 +12,7 @@ namespace NPlaneGeometricObject
     protected:
         NGeometricObjects::Color color;
     public:
-        virtual NGeometry::Vector normal() const = 0;
+        virtual const NGeometry::Vector& normal() const = 0;
         
         NGeometry::Vector getNormal(const NGeometry::Point &p) const
         {

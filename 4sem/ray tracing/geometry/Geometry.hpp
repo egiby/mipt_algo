@@ -67,6 +67,7 @@ namespace NGeometry
     
     Double abs(const Vector &p)
     {
+        //~ return std::hypot(p.x, p.y, p.z);
         return sqrt(p * p);
     }
     

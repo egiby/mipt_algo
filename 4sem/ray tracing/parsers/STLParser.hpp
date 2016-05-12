@@ -38,11 +38,12 @@ namespace NSTLParser
         Screen screen;
         
     public:
-        STLParser (std::vector<LightSource> sources = std::vector<LightSource>(), 
-                                  Point eye = NImageSettings::DEFAULT_EYE,
-                                  Screen screen = NImageSettings::DEFAULT_SCREEN)
+        STLParser (Point eye = NImageSettings::DEFAULT_EYE,
+                   Screen screen = NImageSettings::DEFAULT_SCREEN,
+                   std::vector<LightSource> sources = std::vector<LightSource>())
         : sources(sources), eye(eye), screen(screen)
         {
+            //~ cerr << "parser created\n";
         }
         
         ImageSettings * parseFile(std::string filename)
@@ -75,7 +76,6 @@ namespace NSTLParser
             if (sources.empty())
             {
                 Vector normal = screen.x_basis ^ screen.y_basis;
-                Point center = screen.x_basis * (screen.x_size / 2.0) + screen.y_basis * (screen.y_size / 2.0);
                 
                 Point left_bottom_angle = screen.left_bottom_angle;
                 Point left_upper = left_bottom_angle + screen.x_basis * screen.x_size;
@@ -83,10 +83,12 @@ namespace NSTLParser
                 Point right_upper = left_bottom_angle + screen.y_basis * screen.y_size + screen.x_basis * screen.x_size;
                 
                 //~ LightSource source = {1000, left_bottom_angle - normal * ((screen.x_size + screen.y_size) / 2.0)};
-                sources.push_back({1000, left_bottom_angle - normal * ((screen.x_size + screen.y_size) / 2.0)});
-                sources.push_back({1000, left_upper - normal * ((screen.x_size + screen.y_size) / 2.0)});
-                sources.push_back({1000, right_bottom - normal * ((screen.x_size + screen.y_size) / 2.0)});
-                sources.push_back({1000, right_upper - normal * ((screen.x_size + screen.y_size) / 2.0)});
+                //~ sources.push_back(source);
+                
+                sources.push_back({300, left_bottom_angle - normal * ((screen.x_size + screen.y_size) / 2.0)});
+                sources.push_back({300, left_upper - normal * ((screen.x_size + screen.y_size) / 2.0)});
+                sources.push_back({300, right_bottom - normal * ((screen.x_size + screen.y_size) / 2.0)});
+                sources.push_back({300, right_upper - normal * ((screen.x_size + screen.y_size) / 2.0)});
                 //~ cerr << source.light_force << '\n' << source.point << '\n';
                 //~ cerr << eye << '\n';
             }
