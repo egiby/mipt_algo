@@ -37,23 +37,7 @@ namespace NConvexPolygon
                 s -= d;
         }
         
-        //~ bool is_good = 0;
-        //~ for (ui32 i = 0; i < polygon.size(); ++i)
-        //~ {
-            //~ auto next_1 = (i + 1);
-            //~ if (next_1 >= polygon.size())
-                //~ next_1 -= polygon.size();
-            
-            //~ auto next_2 = (i + 2);
-            //~ if (next_2 >= polygon.size())
-                //~ next_2 -= polygon.size();
-            
-            //~ auto l = (polygon[next_1] - polygon[i]);
-            //~ is_good |= ((p - polygon[i]) ^ l) * ((polygon[next_2] - polygon[i]) ^ l) < Double(0);
-        //~ }
-        
         return s_abs == s;
-        //~ return is_good;
     }
     
     double intersectConvexPolygon(const NGeometry::Ray &ray, const ConvexPolygon * polygon)
@@ -65,11 +49,6 @@ namespace NConvexPolygon
         if (intersection == NGeometry::INFINITY_POINT || (intersection - ray.start) * ray.direction < Double(0.))
             return -1.;
         
-        //~ cerr << "plane: " << std::fixed << plane.a << ' ' << plane.b << ' ' << plane.c << ' ' << plane.d << '\n';
-        //~ cerr << "intersection: " << intersection << '\n';
-        //~ cerr << (*polygon)[0] << '\n';
-        //~ cerr << (*polygon)[1] << '\n';
-        //~ cerr << (*polygon)[2] << '\n';
         if (!isPointInConvexPolygon(intersection, *polygon))
             return -1.;
         

@@ -25,7 +25,7 @@ int main()
     //~ Point eye = {0, 0, 100000};
     
     // humanoid and cube
-    Screen screen = Screen(Point{-3, -1, 2}, Point{-3, -1, -2}, Point{1, 3, 2}, 500, 500);
+    Screen screen = Screen(Point{-3, -1, 2}, Point{-3, -1, -2}, Point{1, 3, 2}, 1000, 1000);
     Point eye = {-100000, 100000, 0};
     
     std::vector<NImageSettings::LightSource> sources;
@@ -44,8 +44,8 @@ int main()
     //~ NPainter::Painter painter("models/magnolia.stl", new NSTLParser::STLParser(eye, screen, sources));
     //~ NPainter::Painter painter("models/teapot.stl", new NSTLParser::STLParser(eye, screen, sources));
     //~ NPainter::Painter painter("models/humanoid.stl", new NSTLParser::STLParser(eye, screen, sources));
-    NPainter::Painter painter("models/cube.stl", new NSTLParser::STLParser(eye, screen, sources));
-    //~ NPainter::Painter painter;
+    //~ NPainter::Painter painter("models/cube.stl", new NSTLParser::STLParser(eye, screen, sources));
+    NPainter::Painter painter;
 
     cerr << "painter created\n";
     //~ painter.paint("models/magnolia.png");
@@ -53,6 +53,10 @@ int main()
     //~ painter.paint("models/humanoid.png");
     //~ painter.paint("models/cube.png");
     
+    //~ Sphere s = Sphere({5, 0, 0}, 5, {0, 128, 0});
+    //~ cerr << s.intersect(NGeometry::Ray({0, 0, 0}, {5, 0, 0})) << '\n';
+    
+    painter.paint();
     auto end = std::chrono::system_clock::now();
     
     cerr << std::chrono::duration<double>(end - start).count() << "s\n";

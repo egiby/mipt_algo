@@ -34,6 +34,7 @@ namespace NGeometricObjects
         virtual NDouble::Double intersect(const NGeometry::Ray &r) const = 0;
         virtual Color getColor() const = 0;
         virtual NGeometry::Vector getNormal(const NGeometry::Point &p) const = 0;
+        //~ virtual NGeometry::Point getCenter() const = 0;
         virtual ~IGeometricObject()
         {
         }
