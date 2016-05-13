@@ -23,13 +23,8 @@ public:
         NDouble::Double coefficient = (r.direction * (center - r.start)) / (r.direction * r.direction);
         NGeometry::Point closest = r.start + r.direction * coefficient;
         
-        //~ cerr << coefficient << '\n';
-        //~ cerr << closest << '\n';
-        
         if ((closest - center) * (closest - center) > radius * radius)
             return -1;
-        
-        //~ cerr << "sphere\n";
         
         if ((closest - center) * (closest - center) == radius * radius)
         {
@@ -37,8 +32,6 @@ public:
         }
         
         NDouble::Double d_coef = sqrt(radius * radius - (closest - center) * (closest - center)) / abs(r.direction);
-        
-        //~ cerr << coefficient << '\n';
         
         if (coefficient - d_coef >= 0.)
             return coefficient - d_coef;

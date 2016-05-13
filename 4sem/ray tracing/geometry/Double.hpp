@@ -43,7 +43,7 @@ namespace NDouble
             return value;
         }
     };
-    const double Double::EPS = 1e-6;
+    const double Double::EPS = 1e-9;
     
     Double operator * (const Double &a, const Double &b)
     {
@@ -99,12 +99,14 @@ namespace NDouble
         return double(a) < double(b) - Double::EPS;
     }
     
-    bool operator < (const double &a, const Double &b)
+    template<typename T>
+    bool operator < (const T &a, const Double &b)
     {
         return double(a) < double(b) - Double::EPS;
     }
     
-    bool operator < (const Double &a, const double &b)
+    template<typename T>
+    bool operator < (const Double &a, const T &b)
     {
         return double(a) < double(b) - Double::EPS;
     }

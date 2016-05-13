@@ -26,6 +26,7 @@ namespace NSTLParser
         {
             std::string word; 
             in >> word;
+            //~ cerr << word << '\n';
             assert(word == "vertex");
             
             Point p;
@@ -56,11 +57,15 @@ namespace NSTLParser
             std::string word;
             while (in >> word)
             {
-                if (word == "vertex")
+                if (word == "normal")
                 {
+                    Vector normal;
+                    in >> normal;
+                    
+                    in >> word >> word;
                     Point v1, v2, v3;
                     
-                    in >> v1;
+                    v1 = readVertex(in);
                     v2 = readVertex(in);
                     v3 = readVertex(in);
                     
@@ -68,6 +73,9 @@ namespace NSTLParser
                     //~ cerr << '\n';
                     
                     Color color = {0, 0, 128};
+                    
+                    if (((v2 - v1) ^ (v3 - v1)) * normal < 0)
+                        std::swap(v2, v3);
                     
                     objects.push_back(new NTriangle::Triangle(color, v1, v2 - v1, v3 - v1));
                 }

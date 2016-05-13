@@ -57,8 +57,7 @@ namespace NPainter
         if (result.object == nullptr)
             return png::rgb_pixel(0, 0, 0);
         
-        Double illuminance = 0.;
-        //~ Double illuminance = 1;
+        Double illuminance = 0;
         
         for (const auto &source: settings->light_sources)
         {
@@ -71,13 +70,9 @@ namespace NPainter
             Vector radius = -(result.point - source.point);
             Vector normal = result.object->getNormal(result.point);
             
-            
-            illuminance += source.light_force * std::fabs(radius * normal) / 
+            illuminance += source.light_force * std::max(radius * normal, Double(0.)) / 
                            (std::pow(abs(radius), 3) * abs(normal));
         }
-        
-        //~ if (illuminance == Double(0.1))
-            //~ cerr << result.point << '\n';
         
         return makePixel(result.object->getColor() * illuminance);
     }
@@ -142,18 +137,14 @@ namespace NPainter
     
     void paintPart(ui32 first, ui32 last, png::image<png::rgb_pixel> &image, Painter &painter)
     {
-        //~ cerr << first << ' ' << last << std::endl;
-        //~ cerr << painter.settings->screen.y_size << std::endl;
         for (ui32 x = first; x < last; ++x)
             for (ui32 y = 0; y < painter.settings->screen.y_size; ++y)
             {
                 Point pixel = painter.calcPixelCenter(x, y);
                 Ray ray(painter.settings->eye, pixel - painter.settings->eye);
                 
-                //~ cerr << x << ' ' << y << std::endl;
                 image[y][x] = calcColor(intersectAll(ray, painter.settings), painter.settings);
             }
-        //~ cerr << "done\n";
     }
 };
 

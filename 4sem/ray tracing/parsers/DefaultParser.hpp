@@ -3,6 +3,10 @@
 
 #include "IFileParser.hpp"
 
+#include "../objects/Triangle.hpp"
+#include "../objects/Parallelogram.hpp"
+#include "../objects/Sphere.hpp"
+
 #include <iostream>
 #include <fstream>
 
@@ -11,25 +15,35 @@
  * <point> = <double> <double> <double>
  * <color> = <uint8_t> <uint8_t> <uint8_t>
  * <size> = <size_t> <size_t>
+ * 
  * <eye> = "eye" <point>
+ * 
  * <screen> = "screen" [
  * (left bottom angle)<point>
  * (left upper angle)<point>
  * (right bottom angle)<point>
  * (size)<size>]
+ * 
  * <triangle> = "triangle" [
  * (vertex)<point>
  * (side_1)<vector>
  * (side_2)<vector>
  * (rgb)<color>]
+ * 
  * <parallelogram> = "parallelogram" [
  * (vertex)<point>
  * (side_1)<vector>
  * (side_2)<vector>
  * (rgb)<color>]
+ * 
  * <light source> = "light_source" [
  * (point)<point>
  * (light force)<double>]
+ * 
+ * <sphere> = "sphere" [
+ * (center)<point>
+ * (radius)<double>
+ * (color)<color>]
  */
 
 namespace NDefaultParser
@@ -105,6 +119,16 @@ namespace NDefaultParser
                     in >> point >> force;
                     
                     sources.push_back(LightSource{force, point});
+                }
+                
+                if (word == "sphere")
+                {
+                    Point center;
+                    NDouble::Double radius;
+                    Color c;
+                    in >> center >> radius >> c.red >> c.green >> c.blue;
+                    
+                    objects.push_back(new Sphere{center, radius, c});
                 }
                 // to be continued...
             }

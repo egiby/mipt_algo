@@ -28,6 +28,12 @@ namespace NGeometricObjects
         return {(ui32)r, (ui32)g, (ui32)b};
     }
     
+    struct Material
+    {
+        ui32 reflecting_coefficient;
+        Color color;
+    };
+    
     class IGeometricObject
     {
     public:
